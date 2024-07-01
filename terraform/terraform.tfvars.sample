@@ -1,0 +1,2 @@
+server_port = 3000
+kubeconfig_path = "~/.minikube/config/config.json"

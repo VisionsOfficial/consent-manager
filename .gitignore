@@ -10,3 +10,6 @@ src/config/keys/*
 */**/logs
 local
 tarballs
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
