@@ -21,15 +21,3 @@ spec:
           envFrom:
             - secretRef:
                 name: env-vars
-          volumeMounts:
-            - name: consent-data
-              mountPath: /data/db
-        - name: mongodb
-          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
-          volumeMounts:
-            - name: consent-data
-              mountPath: /data/db
-      volumes:
-        - name: consent-data
-          persistentVolumeClaim:
-            claimName: mongo-data
