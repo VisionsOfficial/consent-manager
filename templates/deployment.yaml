@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consent-manager
+  namespace: consent-manager
+spec:
+  replicas: { { .Values.replicaCount } }
+  selector:
+    matchLabels:
+      app: consent-manager
+  template:
+    metadata:
+      labels:
+        app: consent-manager
+    spec:
+      containers:
+        - name: consent-manager
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: { { .Values.service.port } }
+          envFrom:
+            - secretRef:
+                name: env-vars
+          volumeMounts:
+            - name: consent-data
+              mountPath: /data/db
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          volumeMounts:
+            - name: consent-data
+              mountPath: /data/db
+      volumes:
+        - name: consent-data
+          persistentVolumeClaim:
+            claimName: mongo-data
