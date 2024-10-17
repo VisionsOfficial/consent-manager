@@ -12,3 +12,6 @@ scripts/
 docs
 docker
 docker-compose.yml
+terraform/
+templates/
+values.yaml
