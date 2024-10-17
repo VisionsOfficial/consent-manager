@@ -10,3 +10,4 @@ src/config/keys/*
 */**/logs
 local
 tarballs
+mochawesome-report
