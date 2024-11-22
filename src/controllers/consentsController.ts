@@ -605,7 +605,6 @@ export const giveConsentUser = async (
   next: NextFunction
 ) => {
   try {
-    req.body.dataProcessingId = "670e8eb6b439a2379f290fc1";
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "user unauthenticated" });
 
