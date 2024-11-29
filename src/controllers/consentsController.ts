@@ -542,7 +542,7 @@ export const giveConsent = async (
         recipientThirdParties:
           dataProcessingId && privacyNotice?.dataProcessings.length > 0
             ? privacyNotice?.dataProcessings.find(
-                (element) => element._id.toString() === dataProcessingId
+                (element) => element.catalogId.toString() === dataProcessingId
               )
             : [],
       }).lean();
@@ -575,7 +575,7 @@ export const giveConsent = async (
         recipientThirdParties:
           dataProcessingId && privacyNotice?.dataProcessings.length > 0
             ? privacyNotice?.dataProcessings.find(
-                (element) => element._id.toString() === dataProcessingId
+                (element) => element.catalogId === dataProcessingId
               )
             : [],
       });
@@ -851,7 +851,7 @@ export const giveConsentUser = async (
       recipientThirdParties:
         dataProcessingId && privacyNotice?.dataProcessings.length > 0
           ? privacyNotice?.dataProcessings.find(
-              (element) => element._id.toString() === dataProcessingId
+              (element) => element.catalogId.toString() === dataProcessingId
             )
           : [],
     });
@@ -1032,7 +1032,7 @@ export const giveConsentOnEmailValidation = async (
       contract: pn.contract,
       event: [consentEvent.given],
       recipientThirdParties: pn.dataProcessings
-        .find((element) => element._id.toString() === dataProcessingId)
+        .find((element) => element.catalogId.toString() === dataProcessingId)
         ?.infrastructureServices.map((infra) => infra.participant),
     });
 
@@ -1623,7 +1623,7 @@ const registerNewUserToConsumerSide = async ({
       contract: privacyNotice.contract,
       event: [consentEvent.given],
       recipientThirdParties: privacyNotice.dataProcessings
-        .find((element) => element._id.toString() === dataProcessingId)
+        .find((element) => element.catalogId.toString() === dataProcessingId)
         ?.infrastructureServices.map((infra) => infra.participant),
     });
     await consent.save();

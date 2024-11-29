@@ -76,7 +76,7 @@ const schema = new Schema<IConsent>(
     processingLocations: [String],
     storageLocations: [String],
     recipientThirdParties: {
-      _id: String,
+      catalogId: String,
       infrastructureServices: [
         {
           name: String,

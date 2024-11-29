@@ -288,7 +288,7 @@ export interface IDataProcessing {
   /**
    * The ID of the data processing
    */
-  _id: string;
+  catalogId: string;
   /**
    * The infrastructure services used for the data processing
    */
