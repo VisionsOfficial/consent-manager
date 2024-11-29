@@ -7,6 +7,7 @@ const schema = new Schema<IPrivacyNoticeDocument>(
     title: String,
     lastUpdated: String,
     dataProvider: String,
+    dataProcessings: [Schema.Types.Mixed],
     controllerDetails: {
       name: String,
       contact: String,
