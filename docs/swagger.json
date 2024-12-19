@@ -1228,7 +1228,7 @@
         "parameters": [
           {
             "name": "participantId",
-            "in": "path",
+            "in": "query",
             "schema": {
               "type": "string"
             },

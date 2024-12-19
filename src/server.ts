@@ -7,8 +7,11 @@ import path from "path";
 // Simulation
 import contractsSimulatedRouter from "./simulated/contract/router";
 import { initSession } from "./middleware/session";
+import { ConsentAgent } from "../../cca/contract-agent/src/ConsentAgent";
+import { Agent } from "../../cca/contract-agent/src/Agent";
+import { MongoDBProvider } from "contract-agent";
 
-export const startServer = (testPort?: number) => {
+export const startServer = async (testPort?: number) => {
   if (!testPort) loadMongoose();
 
   const app = express();
@@ -23,6 +26,11 @@ export const startServer = (testPort?: number) => {
   app.set("trust proxy", true);
 
   app.use(initSession());
+
+  //Consent Agent setup
+  Agent.setConfigPath("../consent-agent.config.json", __filename);
+  Agent.setProfilesHost("profiles");
+  const consentAgent = await ConsentAgent.retrieveService();
 
   loadRoutes(app);
 
