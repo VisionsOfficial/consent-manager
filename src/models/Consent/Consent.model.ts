@@ -75,9 +75,22 @@ const schema = new Schema<IConsent>(
     privacyNotice: { type: String, default: "" },
     processingLocations: [String],
     storageLocations: [String],
-    recipientThirdParties: [
-      { name: String, location: String, natureOfDataAccess: String },
-    ],
+    recipientThirdParties: {
+      catalogId: String,
+      infrastructureServices: [
+        {
+          name: String,
+          location: String,
+          natureOfDataAccess: String,
+          participant: String,
+          serviceOffering: String,
+          params: {
+            type: Schema.Types.ObjectId,
+          },
+          config: String,
+        },
+      ],
+    },
     retentionPeriod: String,
     withdrawalMethod: String,
     token: { type: String, default: "" },

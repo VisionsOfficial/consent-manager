@@ -40,6 +40,7 @@ let consumer2Base64: string;
 let contractbase64: string;
 let contract2base64: string;
 let privacyNoticeId: string;
+let dataProcessingId: string;
 let consentId: string;
 const token = crypto.randomUUID();
 
@@ -177,6 +178,12 @@ describe("Consent Routes Tests", function () {
       "contract",
       "http://localhost:8888/contracts/65e5d715c99e484e4685a964"
     );
+    //tests dataprocessings from contract
+    expect(response.body[0]).to.have.property("dataProcessings").to.be.not
+      .empty;
+    expect(response.body[0].dataProcessings[0]).to.have.property("catalogId");
+
+    dataProcessingId = response.body[0].dataProcessings[0].catalogId;
   });
 
   // getPrivacyNoticeById
@@ -190,6 +197,13 @@ describe("Consent Routes Tests", function () {
     expect(response.body).to.have.property("_id").and.to.equal(privacyNoticeId);
     expect(response.body).to.have.property("contract");
     expect(response.body.dataProvider._id).to.equal(testProvider1.identifier);
+
+    //tests dataprocessings from contract
+    expect(response.body).to.have.property("dataProcessings").to.be.not.empty;
+    expect(response.body.dataProcessings[0]).to.have.property(
+      "catalogId",
+      dataProcessingId
+    );
   });
 
   // giveConsent
@@ -200,11 +214,16 @@ describe("Consent Routes Tests", function () {
       .set("x-user-key", providerUserIdentifier)
       .send({
         privacyNoticeId: privacyNoticeId,
+        dataProcessingId: dataProcessingId,
       })
       .expect(201);
     consentId = response.body.record.recordId;
     expect(response.body.event[0].eventState).to.equal("consent given");
     expect(response.body.piiProcessing.privacyNotice).to.equal(privacyNoticeId);
+    //tests dataprocessings from contract
+    // expect(response.body).to.have.property(
+    //     'recipient',
+    // ).to.be.not.empty;
   });
 
   // // resume consent
