@@ -20,6 +20,18 @@
       "watchChanges": true
     },
     {
+      "source": "participants",
+      "url": "mongodb://localhost:27017",
+      "dbName": "consent-manager",
+      "watchChanges": false
+    },
+    {
+      "source": "useridentifiers",
+      "url": "mongodb://localhost:27017",
+      "dbName": "consent-manager",
+      "watchChanges": false
+    },
+    {
       "source": "profiles",
       "url": "mongodb://localhost:27017",
       "dbName": "consent-manager",

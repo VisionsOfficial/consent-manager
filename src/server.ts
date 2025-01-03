@@ -3,15 +3,17 @@ import cors from "cors";
 import { loadRoutes } from "./routes";
 import { loadMongoose } from "./config/database";
 import path from "path";
+import fs from "fs";
 
 // Simulation
 import contractsSimulatedRouter from "./simulated/contract/router";
 import { initSession } from "./middleware/session";
-import { ConsentAgent } from "../../cca/contract-agent/src/ConsentAgent";
-import { Agent } from "../../cca/contract-agent/src/Agent";
-import { MongoDBProvider } from "contract-agent";
+import { Agent, ConsentAgent } from "contract-agent";
 
-export const startServer = async (testPort?: number) => {
+export const startServer = async (
+  testPort?: number,
+  agentConfigPath?: string
+) => {
   if (!testPort) loadMongoose();
 
   const app = express();
@@ -28,9 +30,19 @@ export const startServer = async (testPort?: number) => {
   app.use(initSession());
 
   //Consent Agent setup
-  Agent.setConfigPath("../consent-agent.config.json", __filename);
+  const configFilePath = path.resolve(
+    __dirname,
+    agentConfigPath ?? "../consent-agent.config.json"
+  );
+  if (!fs.existsSync(configFilePath)) {
+    throw new Error(`Config file not found at path: ${configFilePath}`);
+  }
+  Agent.setConfigPath(
+    agentConfigPath ?? "../consent-agent.config.json",
+    __filename
+  );
   Agent.setProfilesHost("profiles");
-  const consentAgent = await ConsentAgent.retrieveService();
+  await ConsentAgent.retrieveService();
 
   loadRoutes(app);
 
