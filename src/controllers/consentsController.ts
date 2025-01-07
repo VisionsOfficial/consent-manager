@@ -33,7 +33,6 @@ import mongoose from "mongoose";
 import { populatePrivacyNotice } from "../utils/populatePrivacyNotice";
 import { consentToConsentReceipt } from "../utils/consentReceipt";
 import { consentEvent } from "../utils/consentEvent";
-import NodeCache from "node-cache";
 
 const consentSignaturePrivateKey = readFileSync(
   path.join(__dirname, "..", "config", "keys", "consentSignature.pem")

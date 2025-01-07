@@ -34,15 +34,14 @@ export const startServer = async (
     __dirname,
     agentConfigPath ?? "../consent-agent.config.json"
   );
-  if (!fs.existsSync(configFilePath)) {
-    throw new Error(`Config file not found at path: ${configFilePath}`);
+  if (fs.existsSync(configFilePath)) {
+    Agent.setConfigPath(
+      agentConfigPath ?? "../consent-agent.config.json",
+      __filename
+    );
+    Agent.setProfilesHost("profiles");
+    await ConsentAgent.retrieveService();
   }
-  Agent.setConfigPath(
-    agentConfigPath ?? "../consent-agent.config.json",
-    __filename
-  );
-  Agent.setProfilesHost("profiles");
-  await ConsentAgent.retrieveService();
 
   loadRoutes(app);
 
