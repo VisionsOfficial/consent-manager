@@ -108,7 +108,7 @@ cp consent-agent.config.sample.json consent-agent.config.json
 
 After copying this file and filling in your information, the Consent Agent will be configured at startup.
 
-#### Configuring a DataProvider (`contract-agent.config`)
+#### Configuring a DataProvider (`consent-agent.config`)
 
 The configuration file is a JSON document consisting of sections, where each section describes the configuration for a specific **DataProvider**. Below is a detailed explanation of the available attributes:
 
