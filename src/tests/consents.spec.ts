@@ -17,6 +17,7 @@ import {
   testUser1,
 } from "./fixtures/testAccount";
 import { random } from "lodash";
+import mongoose from "mongoose";
 
 let serverInstance: {
   app: Application;
@@ -47,7 +48,16 @@ describe("Consent Routes Tests", function () {
   before(async () => {
     nock.cleanAll();
 
-    serverInstance = startServer(9090);
+    try {
+      await mongoose.connect(process.env.MONGO_URI_TEST);
+      await mongoose.connection.dropDatabase();
+      await mongoose.connection.db.dropDatabase();
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error);
+      throw error;
+    }
+
+    serverInstance = await startServer(9090);
     // Create Provider
     const providerData = testProvider1;
     const providerResponse = await supertest(serverInstance.app)
