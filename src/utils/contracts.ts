@@ -1,5 +1,11 @@
 import { randomUUID } from "crypto";
-import { IConsent, IParticipant, IPrivacyNotice, IUser } from "../types/models";
+import {
+  IConsent,
+  IDataProcessing,
+  IParticipant,
+  IPrivacyNotice,
+  IUser,
+} from "../types/models";
 import Consent from "../models/Consent/Consent.model";
 import { NotFoundError } from "../errors/NotFoundError";
 import { Purpose } from "../types";
@@ -37,6 +43,8 @@ type Policy = {
   prohibition: Permission[];
 };
 
+type DataProcessing = IDataProcessing;
+
 export type BilateralContract = {
   _id: string;
   uid: string;
@@ -65,6 +73,7 @@ export type EcosystemContract = {
   profile: string;
   ecosystem: string;
   orchestrator: string;
+  dataProcessings: DataProcessing[];
   serviceOfferings: {
     participant: string;
     serviceOffering: string;
@@ -154,7 +163,7 @@ export const getPurposeFromBilateralContract = async (
 };
 
 /**
- * Looks for all of the targets from the service offerings inside of the ecosystem contract
+ * Looks for all the targets from the service offerings inside the ecosystem contract
  * If options is specified, will filter only the service offerings based on the specified participants
  *
  * Does not check for if the target is based off a data resource or software resource

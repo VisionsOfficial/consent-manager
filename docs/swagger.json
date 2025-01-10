@@ -19,6 +19,108 @@
         "type": "http",
         "scheme": "bearer"
       }
+    },
+    "schemas": {
+      "PreferencePayload": {
+        "type": "object",
+        "properties": {
+          "preference": {
+            "type": "object",
+            "properties": {
+              "participant": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "asDataProvider": {
+                "type": "object",
+                "properties": {
+                  "authorizationLevel": {
+                    "type": "string"
+                  },
+                  "conditions": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "time": {
+                          "type": "object",
+                          "properties": {
+                            "dayOfWeek": [
+                              {
+                                "type": "string"
+                              }
+                            ],
+                            "startTime": {
+                              "type": "string"
+                            },
+                            "endTime": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "location": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "asServiceProvider": {
+                "type": "object",
+                "properties": {
+                  "authorizationLevel": {
+                    "type": "string"
+                  },
+                  "conditions": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "time": {
+                          "type": "object",
+                          "properties": {
+                            "dayOfWeek": [
+                              {
+                                "type": "string"
+                              }
+                            ],
+                            "startTime": {
+                              "type": "string"
+                            },
+                            "endTime": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "location": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProfileConfigurations": {
+        "type": "object",
+        "properties": {
+          "configurations": {
+            "type": "object",
+            "properties": {
+              "allowRecommendations": {
+                "type": "string"
+              },
+              "allowPolicies": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -33,6 +135,9 @@
     },
     {
       "name": "data-exchange"
+    },
+    {
+      "name": "profile"
     }
   ],
   "paths": {
@@ -1228,7 +1333,7 @@
         "parameters": [
           {
             "name": "participantId",
-            "in": "path",
+            "in": "query",
             "schema": {
               "type": "string"
             },
@@ -3585,6 +3690,451 @@
             "content": {
               "application/json": {}
             }
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/preferences/match": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participant",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "asDataProvider",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "asServiceProvider",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/recommendations/consent": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/recommendations/dataexchanges": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/preferences": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencePayload"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/preferences/{preferenceId}": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "preferenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "preferenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "preferenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/profile/{profileId}/configurations": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileConfigurations"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile/{profileId}": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "userBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "profileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/profile/": {
+      "get": {
+        "tags": ["profile"],
+        "security": [
+          {
+            "participantBearerAuth": {
+              "type": "http",
+              "scheme": "bearer"
+            }
+          }
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

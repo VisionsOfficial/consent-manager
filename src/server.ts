@@ -3,12 +3,17 @@ import cors from "cors";
 import { loadRoutes } from "./routes";
 import { loadMongoose } from "./config/database";
 import path from "path";
+import fs from "fs";
 
 // Simulation
 import contractsSimulatedRouter from "./simulated/contract/router";
 import { initSession } from "./middleware/session";
+import { Agent, ConsentAgent } from "contract-agent";
 
-export const startServer = (testPort?: number) => {
+export const startServer = async (
+  testPort?: number,
+  agentConfigPath?: string
+) => {
   if (!testPort) loadMongoose();
 
   const app = express();
@@ -23,6 +28,20 @@ export const startServer = (testPort?: number) => {
   app.set("trust proxy", true);
 
   app.use(initSession());
+
+  //Consent Agent setup
+  const configFilePath = path.resolve(
+    __dirname,
+    agentConfigPath ?? "../consent-agent.config.json"
+  );
+  if (fs.existsSync(configFilePath)) {
+    Agent.setConfigPath(
+      agentConfigPath ?? "../consent-agent.config.json",
+      __filename
+    );
+    Agent.setProfilesHost("profiles");
+    await ConsentAgent.retrieveService();
+  }
 
   loadRoutes(app);
 

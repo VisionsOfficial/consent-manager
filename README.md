@@ -77,6 +77,7 @@ terraform output consent_manager_service_ip
    ```
 
 5. **Retrieve Service IP**:
+
    ```sh
    kubectl get svc -n consent-manager
    ```
@@ -88,6 +89,50 @@ terraform output consent_manager_service_ip
 ## Endpoints
 
 For a complete list of all available endpoints, along with their request and response schemas, refer to the [JSON Swagger Specification](./docs/swagger.json) provided or visit the [github-pages](https://prometheus-x-association.github.io/consent-manager/) of this repository which displays the swagger specification with the Swagger UI.
+
+## Consent Agent
+
+The Consent Agent is a component of Prometheus-X that handles the preferences and recommendations of the users. It is integrated into the Consent Manager through the `ConsentAgent` class, which is responsible for setting up the agent and retrieving the service.
+
+All endpoints, including those related to the Consent Agent, are documented in the JSON Swagger Specification provided in this repository, in the profile section.
+
+For more information on the Consent Agent and its integration with the Consent Manager, please refer to the [Consent Agent documentation](https://github.com/Prometheus-X-association/contract-consent-agent/blob/main/README.md).
+
+### Configuration
+
+To use the consent agent you must configure the `consent-agent.config.sample.json`
+
+```bash
+cp consent-agent.config.sample.json consent-agent.config.json
+```
+
+After copying this file and filling in your information, the Consent Agent will be configured at startup.
+
+#### Configuring a DataProvider (`consent-agent.config`)
+
+The configuration file is a JSON document consisting of sections, where each section describes the configuration for a specific **DataProvider**. Below is a detailed explanation of the available attributes:
+
+- **`source`**: The name of the target collection or table that the DataProvider connects to.
+- **`url`**: The base URL of the database host.
+- **`dbName`**: The name of the database to be used.
+- **`watchChanges`**: A boolean that enables or disables change monitoring for the DataProvider. When enabled, events will be fired upon detecting changes.
+- **`hostsProfiles`**: A boolean indicating whether the DataProvider hosts the profiles.
+- **`existingDataCheck`**: A boolean that enables the creation of profiles when the module is initialized.
+
+#### Example Configuration
+
+Here’s an example of a JSON configuration:
+
+```json
+{
+  "source": "profiles",
+  "url": "mongodb://localhost:27017",
+  "dbName": "contract_consent_agent_db",
+  "watchChanges": false,
+  "hostsProfiles": true,
+  "existingDataCheck": true
+}
+```
 
 ## Contributing
 

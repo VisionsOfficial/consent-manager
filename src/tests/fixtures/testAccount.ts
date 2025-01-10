@@ -18,10 +18,10 @@ export const testProvider1 = {
 };
 export const testConsumer1 = {
   legalName: "consumer1",
-  identifier: "656dfb3e282d47cfa6b66b2a",
-  did: "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66b2a",
+  identifier: "656dfb3e282d47cfa6b66c4a",
+  did: "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66c4a",
   selfDescriptionURL:
-    "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66b2a",
+    "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66c4a",
   email: "consumer1@email.com",
   endpoints: {
     dataExport: "https://test.consent/data/export",
@@ -60,10 +60,10 @@ export const testParticipant2 = {
 };
 export const testExistingPrticipant = {
   legalName: "provider",
-  identifier: "656dfb3e282d47cfa6b66b2a",
-  did: "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66b2a",
+  identifier: "656dfb3e282d47cfa6b66c4a",
+  did: "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66c4a",
   selfDescriptionURL:
-    "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66b2a",
+    "https://api.test.com/v1/catalog/participants/656dfb3e282d47cfa6b66c4a",
   email: "provider@email.com",
   endpoints: {
     dataExport: "https://test.consent/data/export",

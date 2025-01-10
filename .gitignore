@@ -13,3 +13,8 @@ tarballs
 terraform/.terraform
 terraform/.terraform.lock.hcl
 terraform/terraform.tfvars
+mochawesome-report
+consent-manager.iml
+qodana.yaml
+logs
+mochawesome-report/
