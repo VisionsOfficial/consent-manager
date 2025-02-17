@@ -134,6 +134,16 @@ Here’s an example of a JSON configuration:
 }
 ```
 
+#### Consent Agent Tests
+
+1. Run tests:
+
+```bash
+pnpm test-agent
+```
+
+This command will run your tests using Mocha, with test files located at `./src/tests/*.agent.test.ts`.
+
 ## Contributing
 
 We welcome contributions to the Prometheus-X Consent Manager. If you encounter a bug or wish to propose a new feature, kindly open an issue in the GitHub repository. For code contributions, fork the repository, create a new branch, make your changes, and submit a pull request.
