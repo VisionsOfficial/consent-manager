@@ -8,6 +8,7 @@
     "dev": "pnpm nodemon",
     "build": "rimraf ./dist && tsc",
     "test": "ts-mocha --reporter mochawesome -p tsconfig.json src/tests/*.spec.ts --timeout 4000 --exit",
+    "test-agent": "mocha --require ts-node/register --exit ./src/tests/*.agent.test.ts",
     "prettier": "prettier --write ./src/",
     "lint": "eslint src/**/*.{ts,js}",
     "lint:fix": "eslint src/**/*.{ts,js} --fix",
