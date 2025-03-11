@@ -142,7 +142,110 @@ Here’s an example of a JSON configuration:
 pnpm test-agent
 ```
 
-This command will run your tests using Mocha, with test files located at `./src/tests/*.agent.test.ts`.
+This command will run your tests using Mocha, with test files located at `./src/tests/agent.spec.ts`.
+
+#### example endpoints
+
+> Before using these endpoints you need to signup and login with a user
+
+> <details><summary>GET /${API_PREFIX}/profile/${userId}/configurations</summary>
+>
+> headers: `{"Authorization": Bearer JWT}`
+>
+> input: -
+>
+> output :
+>
+> ```json
+> {
+>   "allowRecommendations": true
+> }
+> ```
+>
+> </details>
+
+> <details><summary>POST /${API_PREFIX}/profile/${userId}/preferences</summary>
+>
+> headers: `{"Authorization": Bearer JWT}`
+>
+> input:
+>
+> ```json
+> {
+>   "preference": [
+>     {
+>       "participant": "65eb2661a50cb6465d41865c",
+>       "asDataProvider": {
+>         "authorizationLevel": "never",
+>         "conditions": [
+>           {
+>             "time": {
+>               "dayOfWeek": ["0"],
+>               "startTime": "2024-03-27T14:08:19.986Z",
+>               "endTime": "2025-03-27T14:08:19.986Z"
+>             }
+>           }
+>         ]
+>       },
+>       "asServiceProvider": {
+>         "authorizationLevel": "always",
+>         "conditions": [
+>           {
+>             "time": {
+>               "dayOfWeek": ["0"],
+>               "startTime": "2024-03-27T14:08:19.986Z",
+>               "endTime": "2025-03-27T14:08:19.986Z"
+>             },
+>             "location": {
+>               "countryCode": "US"
+>             }
+>           }
+>         ]
+>       }
+>     }
+>   ]
+> }
+> ```
+>
+> output :
+>
+> ```json
+> [
+>   {
+>     "participant": "65eb2661a50cb6465d41865c",
+>     "asDataProvider": {
+>       "authorizationLevel": "never",
+>       "conditions": [
+>         {
+>           "time": {
+>             "dayOfWeek": ["0"],
+>             "startTime": "2024-03-27T14:08:19.986Z",
+>             "endTime": "2025-03-27T14:08:19.986Z"
+>           }
+>         }
+>       ]
+>     },
+>     "asServiceProvider": {
+>       "authorizationLevel": "always",
+>       "conditions": [
+>         {
+>           "time": {
+>             "dayOfWeek": ["0"],
+>             "startTime": "2024-03-27T14:08:19.986Z",
+>             "endTime": "2025-03-27T14:08:19.986Z"
+>           },
+>           "location": {
+>             "countryCode": "US"
+>           }
+>         }
+>       ]
+>     },
+>     "_id": "67c7005c5ae3449ac23751de"
+>   }
+> ]
+> ```
+>
+> </details>
 
 ## Contributing
 
