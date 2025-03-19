@@ -2,6 +2,12 @@
 
 The Prometheus-X Consent Manager is a service for managing consent within the Prometheus-X ecosystem. It empowers ecosystem administrators to oversee and enforce consent agreements, data/service providers to adhere to consent regulations, and users to manage their consent preferences seamlessly.
 
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- [pnpm](https://pnpm.io/) package manager installed
+
 ## Installation
 
 ### Locally
@@ -9,7 +15,7 @@ The Prometheus-X Consent Manager is a service for managing consent within the Pr
 ```sh
 git clone https://github.com/Prometheus-X-association/consent-manager.git
 cd consent-manager
-npm install
+pnpm install
 cp .env.sample .env
 # Configure your environment variables in .env
 ```
