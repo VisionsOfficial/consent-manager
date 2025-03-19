@@ -13,9 +13,8 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN git init
 
-
 # Install app dependencies
-RUN pnpm install
+RUN npm install --unsafe-perm
 
 # Copy the rest of the application code to the working directory
 COPY . .
