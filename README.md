@@ -7,6 +7,7 @@ The Prometheus-X Consent Manager is a service for managing consent within the Pr
 Before you begin, ensure you have met the following requirements:
 
 - [pnpm](https://pnpm.io/) package manager installed
+- [mongodb with replicaset](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
 
 ## Installation
 
@@ -188,6 +189,11 @@ Here’s an example of a JSON configuration:
 
 #### Consent Agent Tests
 
+##### Prerequisites for running the test agent
+
+- .env file
+- Mongodb database with [replica-set](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
+
 1. Run tests:
 
 ```bash
@@ -195,6 +201,18 @@ pnpm test-agent
 ```
 
 This command will run your tests using Mocha, with test files located at `./src/tests/agent.spec.ts`.
+
+2. Run tests in docker
+
+```bash
+docker exec -it consent-manager npm run test-agent
+```
+
+> <details><summary>Expected output</summary>
+>
+> ![expected output](./docs/images/test-agent-output.png)
+>
+> </details>
 
 #### example endpoints
 
