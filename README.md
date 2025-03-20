@@ -2,6 +2,13 @@
 
 The Prometheus-X Consent Manager is a service for managing consent within the Prometheus-X ecosystem. It empowers ecosystem administrators to oversee and enforce consent agreements, data/service providers to adhere to consent regulations, and users to manage their consent preferences seamlessly.
 
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- [pnpm](https://pnpm.io/) package manager installed
+- [mongodb with replicaset](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
+
 ## Installation
 
 ### Locally
@@ -9,7 +16,7 @@ The Prometheus-X Consent Manager is a service for managing consent within the Pr
 ```sh
 git clone https://github.com/Prometheus-X-association/consent-manager.git
 cd consent-manager
-npm install
+pnpm install
 cp .env.sample .env
 # Configure your environment variables in .env
 ```
@@ -19,6 +26,52 @@ cp .env.sample .env
 1. Clone the repository from GitHub: `git clone https://github.com/Prometheus-X-association/consent-manager.git`
 2. Navigate to the project directory: `cd consent-manager` and copy the .env.sample to .env `cp .env.sample .env`
 3. Configure the application by setting up the necessary environment variables. You will need to specify database connection details and other relevant settings.
+
+```.dotenv
+#Example
+NODE_ENV=development
+PORT=8887
+APP_ENDPOINT=http://localhost:8887
+MONGO_URI=mongodb://localhost:27017/consent-manager
+MONGO_URI_TEST=mongodb://localhost:27017/consent-manager-test
+API_PREFIX=/v1
+SALT_ROUNDs=10
+PDI_ENDPOINT=http://localhost:5174/auth
+
+APPLICATION_NAME=consentmanager
+FEDERATED_APPLICATION_IDENTIFIER=http://localhost:8887
+
+SESSION_COOKIE_NAME=consentmanagersessid
+SESSION_SECRET=secret123
+JWT_SECRET_KEY=secret123
+
+OAUTH_SECRET_KEY=abc123secret
+OAUTH_TOKEN_EXPIRES_IN=1h
+
+#uri of the contract used
+CONTRACT_SERVICE_BASE_URL=http://localhost:8888
+
+#nodemailer
+NODEMAILER_HOST=ssl0.ovh.net
+NODEMAILER_PORT=587
+NODEMAILER_USER=noreply@visionstrust.com
+NODEMAILER_PASS=%@PviPG!wjLm4#b
+NODEMAILER_FROM_NOREPLY="VisionsTrust <noreply@visionstrust.com>"
+
+#mandrill
+MANDRILL_ENABLED=false
+MANDRILL_API_KEY="mandrillapikey"
+MANDRILL_FROM_EMAIL="noreply@visionstrust.com"
+MANDRILL_FROM_NAME="noreply"
+
+#variable used for the consent record
+PRIVACY_RIGHTS=test,test
+WITHDRAWAL_METHOD=https://github.com/Prometheus-X-association/consent-manager
+CODE_OF_CONDUCT=https://example.com/CoC-news-media
+IMPACT_ASSESSMENT=https://example.com/dpia
+AUTHORITY_PARTY=DPC-IE
+```
+
 4. Generate the needed key with `npm run generatePrivateKey && npm run generateAES && npm run generatePublicKey`
 5. Create a docker network using `docker network create ptx`
 6. Start the application: `docker-compose up -d`
@@ -136,6 +189,11 @@ Here’s an example of a JSON configuration:
 
 #### Consent Agent Tests
 
+##### Prerequisites for running the test agent
+
+- .env file
+- Mongodb database with [replica-set](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
+
 1. Run tests:
 
 ```bash
@@ -143,6 +201,18 @@ pnpm test-agent
 ```
 
 This command will run your tests using Mocha, with test files located at `./src/tests/agent.spec.ts`.
+
+2. Run tests in docker
+
+```bash
+docker exec -it consent-manager npm run test-agent
+```
+
+> <details><summary>Expected output</summary>
+>
+> ![expected output](./docs/images/test-agent-output.png)
+>
+> </details>
 
 #### example endpoints
 
