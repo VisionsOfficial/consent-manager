@@ -216,7 +216,48 @@ docker exec -it consent-manager npm run test-agent
 
 #### example endpoints
 
-> Before using these endpoints you need to signup and login with a user
+> <details><summary>Before using these endpoints you need to signup with a user to get access token</summary>
+>
+> POST /${API_PREFIX}/profile/${userId}/configurations
+>
+> input:
+>
+> ```json
+> {
+>   "firstName": "john",
+>   "lastName": "doe",
+>   "email": "john@doe.com",
+>   "password": "1234"
+> }
+> ```
+>
+> output :
+>
+> ```json
+> {
+>   "user": {
+>     "firstName": "john",
+>     "lastName": "doe",
+>     "email": "john@doe.com",
+>     "password": "$2b$10$Vf7EoR.Wp3GxWWb6LUNU1OSgahDppRSOCyU3X0Wan5AcR/88b6BpO",
+>     "identifiers": [],
+>     "oauth": {
+>       "scopes": ["Read user data", "Modify user data"],
+>       "refreshToken": "62025bd0886e77f1f895b0d1b9e70c82ef8af61f6232298d7c14bb630bfdf62f"
+>     },
+>     "jsonld": "{\n  \"@context\": \"http://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"john doe\",\n  \"email\": \"john@doe.fr\",\n  \"url\": \"undefined:8887/v1/users/67dd2b9d389148595b049e9d\"\n}",
+>     "schema_version": "v0.1.0",
+>     "_id": "67dd2b9d389148595b049e9d",
+>     "createdAt": "2025-03-21T09:04:29.719Z",
+>     "updatedAt": "2025-03-21T09:04:29.719Z",
+>     "__v": 0
+>   },
+>   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2RkMmI5ZDM4OTE0ODU5NWIwNDllOWQiLCJlbWFpbCI6ImpvaG5AZG9lLmZyIiwic2NvcGVzIjpbIlJlYWQgdXNlciBkYXRhIiwiTW9kaWZ5IHVzZXIgZGF0YSJdLCJpYXQiOjE3NDI1NDc4NjksImV4cCI6MTc0MjU1MTQ2OX0.U67aO9mUn1ITceeQSFpHyA0WuguW9M4zg2cPlTQXNUU",
+>   "refreshToken": "62025bd0886e77f1f895b0d1b9e70c82ef8af61f6232298d7c14bb630bfdf62f"
+> }
+> ```
+>
+> </details>
 
 > <details><summary>GET /${API_PREFIX}/profile/${userId}/configurations</summary>
 >
@@ -316,6 +357,8 @@ docker exec -it consent-manager npm run test-agent
 > ```
 >
 > </details>
+
+For more information see the [Tests definition](https://github.com/Prometheus-X-association/consent-manager/wiki/Tests-definition).
 
 ## Contributing
 
