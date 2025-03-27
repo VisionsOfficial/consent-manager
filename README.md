@@ -30,16 +30,16 @@ cp .env.sample .env
 ```.dotenv
 #Example
 NODE_ENV=development
-PORT=8887
-APP_ENDPOINT=http://localhost:8887
-MONGO_URI=mongodb://localhost:27017/consent-manager
-MONGO_URI_TEST=mongodb://localhost:27017/consent-manager-test
+PORT=3000
+APP_ENDPOINT=http://localhost:3000
+MONGO_URI=mongodb://consent-manager-mongodb:27017/consent-manager
+MONGO_URI_TEST=mongodb://consent-manager-mongodb:27017/consent-manager-test
 API_PREFIX=/v1
 SALT_ROUNDs=10
-PDI_ENDPOINT=http://localhost:5174/auth
+PDI_ENDPOINT=http://localhost:3331
 
-APPLICATION_NAME=consentmanager
-FEDERATED_APPLICATION_IDENTIFIER=http://localhost:8887
+APPLICATION_NAME=consentmanager-pdi
+FEDERATED_APPLICATION_IDENTIFIER=http://localhost:3000
 
 SESSION_COOKIE_NAME=consentmanagersessid
 SESSION_SECRET=secret123
@@ -48,28 +48,33 @@ JWT_SECRET_KEY=secret123
 OAUTH_SECRET_KEY=abc123secret
 OAUTH_TOKEN_EXPIRES_IN=1h
 
-#uri of the contract used
-CONTRACT_SERVICE_BASE_URL=http://localhost:8888
+CONTRACT_SERVICE_BASE_URL=http://localhost:3000/contracts
 
-#nodemailer
-NODEMAILER_HOST=ssl0.ovh.net
-NODEMAILER_PORT=587
-NODEMAILER_USER=noreply@visionstrust.com
-NODEMAILER_PASS=%@PviPG!wjLm4#b
-NODEMAILER_FROM_NOREPLY="VisionsTrust <noreply@visionstrust.com>"
+# Logs
+WINSTON_LOGS_MAX_FILES=14d
+WINSTON_LOGS_MAX_SIZE=20m
 
-#mandrill
+# Nodemailer
+NODEMAILER_HOST=
+NODEMAILER_PORT=
+NODEMAILER_USER=abc@domain.com
+NODEMAILER_PASS=pass
+NODEMAILER_FROM_NOREPLY="abc <abc@domain.com>"
+
+#MANDRILL
 MANDRILL_ENABLED=false
-MANDRILL_API_KEY="mandrillapikey"
+MANDRILL_API_KEY="yourkey"
 MANDRILL_FROM_EMAIL="noreply@visionstrust.com"
 MANDRILL_FROM_NAME="noreply"
 
-#variable used for the consent record
-PRIVACY_RIGHTS=test,test
-WITHDRAWAL_METHOD=https://github.com/Prometheus-X-association/consent-manager
-CODE_OF_CONDUCT=https://example.com/CoC-news-media
-IMPACT_ASSESSMENT=https://example.com/dpia
-AUTHORITY_PARTY=DPC-IE
+#Consent
+#add multiple by adding ","
+PRIVACY_RIGHTS=
+
+WITHDRAWAL_METHOD=
+CODE_OF_CONDUCT=
+IMPACT_ASSESSMENT=
+AUTHORITY_PARTY=
 ```
 
 4. Generate the needed key with `npm run generatePrivateKey && npm run generateAES && npm run generatePublicKey`
