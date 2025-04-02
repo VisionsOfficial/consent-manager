@@ -13,6 +13,6 @@
     "typeRoots": ["src/types/*/**"],
     "types": ["node", "mocha", "chai", "sinon"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "consent-agent.config.json"],
   "files": ["src/types/index.d.ts"]
 }

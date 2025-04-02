@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   consent-manager:
     container_name: "consent-manager"
@@ -13,6 +11,8 @@ services:
       - mongodb
     env_file:
       - .env
+    depends_on:
+      - mongodb
     networks:
       - consent-manager
       - ptx
@@ -22,11 +22,16 @@ services:
     build:
       context: .
       dockerfile: docker/mongodb/Dockerfile
-    #    Uncomment to connect mongodb container to mongo compass or another service
-    #    ports:
-    #      - "27017:27017"
+    ports:
+      - "27017:27017"
     volumes:
       - consent_data:/data/db
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'consent-manager-mongodb:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      retries: 30
     networks:
       - consent-manager
 

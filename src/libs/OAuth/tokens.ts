@@ -19,11 +19,10 @@ export const generateAccessToken = (user: IUser, scopes: string[]): string => {
     scopes: scopes,
   };
 
-  const accessToken = jwt.sign(payload, process.env.OAUTH_SECRET_KEY, {
-    expiresIn: process.env.OAUTH_TOKEN_EXPIRES_IN,
+  //TODO temporary solution to resolves docker error (expiresIn)
+  return jwt.sign(payload, process.env.OAUTH_SECRET_KEY, {
+    expiresIn: "1h",
   });
-
-  return accessToken;
 };
 
 export const generateRefreshToken = async (
@@ -49,9 +48,8 @@ export const generateNewAccessToken = (
     scopes: scopes,
   };
 
-  const newAccessToken = jwt.sign(payload, process.env.OAUTH_SECRET_KEY, {
-    expiresIn: process.env.OAUTH_TOKEN_EXPIRES_IN,
+  //TODO temporary solution to resolves docker error (expiresIn)
+  return jwt.sign(payload, process.env.OAUTH_SECRET_KEY, {
+    expiresIn: "1h",
   });
-
-  return newAccessToken;
 };

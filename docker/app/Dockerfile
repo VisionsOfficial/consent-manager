@@ -13,15 +13,16 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN git init
 
-
 # Install app dependencies
-RUN pnpm install
+RUN npm install --unsafe-perm
 
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Ensure necessary permissions
-RUN chown -R node:node /usr/src/app
+#Generate key
+RUN npm run generatePrivateKey
+RUN npm run generateAES
+RUN npm run generatePublicKey
 
 # Command to run the application
 CMD ["sh", "-c", "pnpm run build && pnpm run copyKeys && pnpm run start"]

@@ -3,37 +3,37 @@
   "dataProviderConfig": [
     {
       "source": "users",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": true
     },
     {
       "source": "consents",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": true
     },
     {
       "source": "privacynotices",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": true
     },
     {
       "source": "participants",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": false
     },
     {
       "source": "useridentifiers",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": false
     },
     {
       "source": "profiles",
-      "url": "mongodb://127.0.0.1:27017/consent-manager-test",
+      "url": "mongodb://localhost:27017/consent-manager-test",
       "dbName": "",
       "watchChanges": false,
       "hostsProfiles": true

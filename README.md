@@ -2,6 +2,13 @@
 
 The Prometheus-X Consent Manager is a service for managing consent within the Prometheus-X ecosystem. It empowers ecosystem administrators to oversee and enforce consent agreements, data/service providers to adhere to consent regulations, and users to manage their consent preferences seamlessly.
 
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- [pnpm](https://pnpm.io/) package manager installed
+- [mongodb with replicaset](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
+
 ## Installation
 
 ### Locally
@@ -9,7 +16,7 @@ The Prometheus-X Consent Manager is a service for managing consent within the Pr
 ```sh
 git clone https://github.com/Prometheus-X-association/consent-manager.git
 cd consent-manager
-npm install
+npm install --unsafe-perm
 cp .env.sample .env
 # Configure your environment variables in .env
 ```
@@ -19,11 +26,60 @@ cp .env.sample .env
 1. Clone the repository from GitHub: `git clone https://github.com/Prometheus-X-association/consent-manager.git`
 2. Navigate to the project directory: `cd consent-manager` and copy the .env.sample to .env `cp .env.sample .env`
 3. Configure the application by setting up the necessary environment variables. You will need to specify database connection details and other relevant settings.
-4. Generate the needed key with `npm run generatePrivateKey && npm run generateAES && npm run generatePublicKey`
-5. Create a docker network using `docker network create ptx`
-6. Start the application: `docker-compose up -d`
-7. If you need to rebuild the image `docker-compose build` and restart with: `docker-compose up -d`
-8. If you don't want to use the mongodb container from the docker compose you can use the command `docker run -d -p your-port:your-port --name consent-manager consent-manager` after running `docker-compose build`
+
+```.dotenv
+#Example
+NODE_ENV=development
+PORT=3000
+APP_ENDPOINT=http://localhost:3000
+MONGO_URI=mongodb://consent-manager-mongodb:27017/consent-manager
+MONGO_URI_TEST=mongodb://consent-manager-mongodb:27017/consent-manager-test
+API_PREFIX=/v1
+SALT_ROUNDs=10
+PDI_ENDPOINT=http://localhost:3331
+
+APPLICATION_NAME=consentmanager-pdi
+FEDERATED_APPLICATION_IDENTIFIER=http://localhost:3000
+
+SESSION_COOKIE_NAME=consentmanagersessid
+SESSION_SECRET=secret123
+JWT_SECRET_KEY=secret123
+
+OAUTH_SECRET_KEY=abc123secret
+OAUTH_TOKEN_EXPIRES_IN=1h
+
+CONTRACT_SERVICE_BASE_URL=http://localhost:3000/contracts
+
+# Logs
+WINSTON_LOGS_MAX_FILES=14d
+WINSTON_LOGS_MAX_SIZE=20m
+
+# Nodemailer
+NODEMAILER_HOST=
+NODEMAILER_PORT=
+NODEMAILER_USER=abc@domain.com
+NODEMAILER_PASS=pass
+NODEMAILER_FROM_NOREPLY="abc <abc@domain.com>"
+
+#MANDRILL
+MANDRILL_ENABLED=false
+MANDRILL_API_KEY="yourkey"
+MANDRILL_FROM_EMAIL="noreply@visionstrust.com"
+MANDRILL_FROM_NAME="noreply"
+
+#Consent
+#add multiple by adding ","
+PRIVACY_RIGHTS=
+
+WITHDRAWAL_METHOD=
+CODE_OF_CONDUCT=
+IMPACT_ASSESSMENT=
+AUTHORITY_PARTY=
+```
+
+4. Create a docker network using `docker network create ptx`
+5. Start the application: `docker-compose up -d --build`
+6. If you don't want to use the mongodb container from the docker compose you can use the command `docker run -d -p your-port:your-port --name consent-manager consent-manager` after running `docker-compose build`
 
 The consent manager is a work in progress, evolving alongside developments of the Contract and Catalog components of the Prometheus-X Ecosystem.
 
@@ -136,6 +192,11 @@ Here’s an example of a JSON configuration:
 
 #### Consent Agent Tests
 
+##### Prerequisites for running the test agent
+
+- .env file
+- Mongodb database with [replica-set](https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/)
+
 1. Run tests:
 
 ```bash
@@ -144,9 +205,62 @@ pnpm test-agent
 
 This command will run your tests using Mocha, with test files located at `./src/tests/agent.spec.ts`.
 
+2. Run tests in docker
+
+```bash
+docker exec -it consent-manager npm run test-agent
+```
+
+> <details><summary>Expected output</summary>
+>
+> ![expected output](./docs/images/test-agent-output.png)
+>
+> </details>
+
 #### example endpoints
 
-> Before using these endpoints you need to signup and login with a user
+> <details><summary>Before using these endpoints you need to signup with a user to get access token</summary>
+>
+> POST /${API_PREFIX}/users/signup
+>
+> input:
+>
+> ```json
+> {
+>   "firstName": "john",
+>   "lastName": "doe",
+>   "email": "john@doe.com",
+>   "password": "1234"
+> }
+> ```
+>
+> output :
+>
+> ```json
+> {
+>   "user": {
+>     "firstName": "john",
+>     "lastName": "doe",
+>     "email": "john@doe.com",
+>     "password": "$2b$10$Vf7EoR.Wp3GxWWb6LUNU1OSgahDppRSOCyU3X0Wan5AcR/88b6BpO",
+>     "identifiers": [],
+>     "oauth": {
+>       "scopes": ["Read user data", "Modify user data"],
+>       "refreshToken": "62025bd0886e77f1f895b0d1b9e70c82ef8af61f6232298d7c14bb630bfdf62f"
+>     },
+>     "jsonld": "{\n  \"@context\": \"http://schema.org\",\n  \"@type\": \"Person\",\n  \"name\": \"john doe\",\n  \"email\": \"john@doe.fr\",\n  \"url\": \"undefined:8887/v1/users/67dd2b9d389148595b049e9d\"\n}",
+>     "schema_version": "v0.1.0",
+>     "_id": "67dd2b9d389148595b049e9d",
+>     "createdAt": "2025-03-21T09:04:29.719Z",
+>     "updatedAt": "2025-03-21T09:04:29.719Z",
+>     "__v": 0
+>   },
+>   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2RkMmI5ZDM4OTE0ODU5NWIwNDllOWQiLCJlbWFpbCI6ImpvaG5AZG9lLmZyIiwic2NvcGVzIjpbIlJlYWQgdXNlciBkYXRhIiwiTW9kaWZ5IHVzZXIgZGF0YSJdLCJpYXQiOjE3NDI1NDc4NjksImV4cCI6MTc0MjU1MTQ2OX0.U67aO9mUn1ITceeQSFpHyA0WuguW9M4zg2cPlTQXNUU",
+>   "refreshToken": "62025bd0886e77f1f895b0d1b9e70c82ef8af61f6232298d7c14bb630bfdf62f"
+> }
+> ```
+>
+> </details>
 
 > <details><summary>GET /${API_PREFIX}/profile/${userId}/configurations</summary>
 >
@@ -246,6 +360,8 @@ This command will run your tests using Mocha, with test files located at `./src/
 > ```
 >
 > </details>
+
+For more information see the [Tests definition](https://github.com/Prometheus-X-association/consent-manager/wiki/Tests-definition).
 
 ## Contributing
 
