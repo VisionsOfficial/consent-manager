@@ -16,7 +16,7 @@ Before you begin, ensure you have met the following requirements:
 ```sh
 git clone https://github.com/Prometheus-X-association/consent-manager.git
 cd consent-manager
-pnpm install
+npm install --unsafe-perm
 cp .env.sample .env
 # Configure your environment variables in .env
 ```
@@ -77,11 +77,9 @@ IMPACT_ASSESSMENT=
 AUTHORITY_PARTY=
 ```
 
-4. Generate the needed key with `npm run generatePrivateKey && npm run generateAES && npm run generatePublicKey`
-5. Create a docker network using `docker network create ptx`
-6. Start the application: `docker-compose up -d`
-7. If you need to rebuild the image `docker-compose build` and restart with: `docker-compose up -d`
-8. If you don't want to use the mongodb container from the docker compose you can use the command `docker run -d -p your-port:your-port --name consent-manager consent-manager` after running `docker-compose build`
+4. Create a docker network using `docker network create ptx`
+5. Start the application: `docker-compose up -d --build`
+6. If you don't want to use the mongodb container from the docker compose you can use the command `docker run -d -p your-port:your-port --name consent-manager consent-manager` after running `docker-compose build`
 
 The consent manager is a work in progress, evolving alongside developments of the Contract and Catalog components of the Prometheus-X Ecosystem.
 
@@ -223,7 +221,7 @@ docker exec -it consent-manager npm run test-agent
 
 > <details><summary>Before using these endpoints you need to signup with a user to get access token</summary>
 >
-> POST /${API_PREFIX}/profile/${userId}/configurations
+> POST /${API_PREFIX}/users/signup
 >
 > input:
 >
