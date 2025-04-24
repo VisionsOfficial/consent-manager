@@ -286,13 +286,18 @@ export interface IConsent extends Document, AllSchemas {
 
 export interface IDataProcessing {
   /**
+   * @deprecated
    * The ID of the data processing
    */
-  catalogId: string;
+  catalogId?: string;
+  /**
+   * The ID of the data processing
+   */
+  serviceChainId: string;
   /**
    * The infrastructure services used for the data processing
    */
-  infrastructureServices: IInfrastructureService[];
+  services: IInfrastructureService[];
 }
 
 export interface IInfrastructureService {
@@ -303,7 +308,7 @@ export interface IInfrastructureService {
   /**
    * The ID of the service offering
    */
-  serviceOffering: string;
+  service: string;
   /**
    * configuration
    */
@@ -377,7 +382,7 @@ export interface IPrivacyNotice {
   /**
    * Information about the data processing.
    */
-  dataProcessings?: IDataProcessing[];
+  serviceChains?: IDataProcessing[];
 
   /**
    * Details regarding transfers of personal data to third countries or international organizations, including the identification of those third countries or international organizations and, in the case of such transfers, the documentation of suitable safeguards.

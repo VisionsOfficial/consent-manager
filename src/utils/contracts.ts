@@ -73,7 +73,7 @@ export type EcosystemContract = {
   profile: string;
   ecosystem: string;
   orchestrator: string;
-  dataProcessings: DataProcessing[];
+  serviceChains: DataProcessing[];
   serviceOfferings: {
     participant: string;
     serviceOffering: string;

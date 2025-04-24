@@ -540,9 +540,10 @@ export const giveConsent = async (
           $nin: ["terminated", "revoked", "refused"],
         },
         recipientThirdParties:
-          dataProcessingId && privacyNotice?.dataProcessings.length > 0
-            ? privacyNotice?.dataProcessings.find(
-                (element) => element.catalogId.toString() === dataProcessingId
+          dataProcessingId && privacyNotice?.serviceChains.length > 0
+            ? privacyNotice?.serviceChains.find(
+                (element) =>
+                  element.serviceChainId.toString() === dataProcessingId
               )
             : [],
       }).lean();
@@ -573,9 +574,9 @@ export const giveConsent = async (
         contract: privacyNotice.contract,
         event: [consentEvent.given],
         recipientThirdParties:
-          dataProcessingId && privacyNotice?.dataProcessings.length > 0
-            ? privacyNotice?.dataProcessings.find(
-                (element) => element.catalogId === dataProcessingId
+          dataProcessingId && privacyNotice?.serviceChains.length > 0
+            ? privacyNotice?.serviceChains.find(
+                (element) => element.serviceChainId === dataProcessingId
               )
             : [],
       });
@@ -849,9 +850,10 @@ export const giveConsentUser = async (
       contract: privacyNotice.contract,
       event: [consentEvent.given],
       recipientThirdParties:
-        dataProcessingId && privacyNotice?.dataProcessings.length > 0
-          ? privacyNotice?.dataProcessings.find(
-              (element) => element.catalogId.toString() === dataProcessingId
+        dataProcessingId && privacyNotice?.serviceChains.length > 0
+          ? privacyNotice?.serviceChains.find(
+              (element) =>
+                element.serviceChainId.toString() === dataProcessingId
             )
           : [],
     });
@@ -1031,9 +1033,11 @@ export const giveConsentOnEmailValidation = async (
       consumerUserIdentifier: consumerUserIdentifier,
       contract: pn.contract,
       event: [consentEvent.given],
-      recipientThirdParties: pn.dataProcessings
-        .find((element) => element.catalogId.toString() === dataProcessingId)
-        ?.infrastructureServices.map((infra) => infra.participant),
+      recipientThirdParties: pn.serviceChains
+        .find(
+          (element) => element.serviceChainId.toString() === dataProcessingId
+        )
+        ?.services.map((infra) => infra.participant),
     });
 
     await Promise.all([userToUpdate.save(), consent.save()]);
@@ -1622,9 +1626,11 @@ const registerNewUserToConsumerSide = async ({
       consented: false,
       contract: privacyNotice.contract,
       event: [consentEvent.given],
-      recipientThirdParties: privacyNotice.dataProcessings
-        .find((element) => element.catalogId.toString() === dataProcessingId)
-        ?.infrastructureServices.map((infra) => infra.participant),
+      recipientThirdParties: privacyNotice.serviceChains
+        .find(
+          (element) => element.serviceChainId.toString() === dataProcessingId
+        )
+        ?.services.map((infra) => infra.participant),
     });
     await consent.save();
   } else {

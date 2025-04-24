@@ -181,9 +181,11 @@ describe("Consent Routes Tests", function () {
     //tests dataprocessings from contract
     expect(response.body[0]).to.have.property("dataProcessings").to.be.not
       .empty;
-    expect(response.body[0].dataProcessings[0]).to.have.property("catalogId");
+    expect(response.body[0].serviceChains[0]).to.have.property(
+      "serviceChainId"
+    );
 
-    dataProcessingId = response.body[0].dataProcessings[0].catalogId;
+    dataProcessingId = response.body[0].servicesChains[0].serviceChainId;
   });
 
   // getPrivacyNoticeById
@@ -200,8 +202,8 @@ describe("Consent Routes Tests", function () {
 
     //tests dataprocessings from contract
     expect(response.body).to.have.property("dataProcessings").to.be.not.empty;
-    expect(response.body.dataProcessings[0]).to.have.property(
-      "catalogId",
+    expect(response.body.serviceChains[0]).to.have.property(
+      "serviceChainId",
       dataProcessingId
     );
   });

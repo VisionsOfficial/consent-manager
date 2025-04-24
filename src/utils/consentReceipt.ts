@@ -13,9 +13,8 @@ export const consentToConsentReceipt = async (
 
   const recipientSelfDescriptions: any[] = [];
 
-  if (consent.recipientThirdParties?.catalogId) {
-    for (const recipient of consent.recipientThirdParties
-      .infrastructureServices) {
+  if (consent.recipientThirdParties?.serviceChainId) {
+    for (const recipient of consent.recipientThirdParties.services) {
       const response = await axios.get(recipient.participant);
       recipientSelfDescriptions.push({
         participant: recipient.participant,

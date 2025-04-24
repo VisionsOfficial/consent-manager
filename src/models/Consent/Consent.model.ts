@@ -77,13 +77,14 @@ const schema = new Schema<IConsent>(
     storageLocations: [String],
     recipientThirdParties: {
       catalogId: String,
-      infrastructureServices: [
+      serviceChainId: String,
+      services: [
         {
           name: String,
           location: String,
           natureOfDataAccess: String,
           participant: String,
-          serviceOffering: String,
+          service: String,
           params: {
             type: Schema.Types.ObjectId,
           },

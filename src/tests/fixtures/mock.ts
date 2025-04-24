@@ -341,24 +341,24 @@ export const setupnockMocks = (providerBase64: string) => {
               status: "Signed",
             },
           ],
-          dataProcessings: [
+          serviceChains: [
             {
               catalogId: "670e8eb6b439a2379f290fc1",
-              infrastructureServices: [
+              serviceChainId: "670e8eb6b439a2379f290fc1",
+              services: [
                 {
                   participant: `${testUrl}/v1/catalog/participants/656dfb3e282d47cfa6b66b2b`,
-                  serviceOffering: `${testUrl}/v1/catalog/serviceofferings/65e04da4b37bfc192ddcbdd0`,
+                  service: `${testUrl}/v1/catalog/serviceofferings/65e04da4b37bfc192ddcbdd0`,
                 },
                 {
                   participant: `${testUrl}/v1/catalog/participants/66d18a1dee71f9f096baec07`,
-                  serviceOffering: `${testUrl}/v1/catalog/serviceofferings/672c8e77870a096712ca7676`,
+                  service: `${testUrl}/v1/catalog/serviceofferings/672c8e77870a096712ca7676`,
                 },
                 {
                   participant: `${testUrl}/v1/catalog/participants/656dfb3e282d47cfa6b66c4a`,
-                  serviceOffering: `${testUrl}/v1/catalog/serviceofferings/65e04da4b37bfc192ddcbdd1`,
+                  service: `${testUrl}/v1/catalog/serviceofferings/65e04da4b37bfc192ddcbdd1`,
                 },
               ],
-              status: "active",
               _id: { $oid: "674981ed70a7d9606bb2ed42" },
             },
           ],
