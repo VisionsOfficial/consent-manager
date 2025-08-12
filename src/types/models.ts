@@ -259,7 +259,7 @@ export interface IConsent extends Document, AllSchemas {
    * geo-location of data transfer, and wheth-
    * er it constitutes a jurisdictional change.
    */
-  recipientThirdParties?: IDataProcessing;
+  recipientThirdParties?: IServiceChain;
 
   /**
    * Ex: "right to access", "right to erasure"...
@@ -284,7 +284,7 @@ export interface IConsent extends Document, AllSchemas {
   event: IEvent[];
 }
 
-export interface IDataProcessing {
+export interface IServiceChain {
   /**
    * The ID of the data processing
    */
@@ -292,10 +292,10 @@ export interface IDataProcessing {
   /**
    * The infrastructure services used for the data processing
    */
-  infrastructureServices: IInfrastructureService[];
+  services: IService[];
 }
 
-export interface IInfrastructureService {
+export interface IService {
   /**
    * The ID of the participant
    */
@@ -303,7 +303,7 @@ export interface IInfrastructureService {
   /**
    * The ID of the service offering
    */
-  serviceOffering: string;
+  service: string;
   /**
    * configuration
    */
@@ -377,7 +377,7 @@ export interface IPrivacyNotice {
   /**
    * Information about the data processing.
    */
-  dataProcessings?: IDataProcessing[];
+  serviceChains?: IServiceChain[];
 
   /**
    * Details regarding transfers of personal data to third countries or international organizations, including the identification of those third countries or international organizations and, in the case of such transfers, the documentation of suitable safeguards.
@@ -547,7 +547,7 @@ export interface IPurpose {
    * geo-location of data transfer, and wheth-
    * er it constitutes a jurisdictional change.
    */
-  recipientThirdParties: IDataProcessing;
+  recipientThirdParties: IServiceChain;
   /**
    * Indicates information or link on how and
    * where the PII principal can withdraw

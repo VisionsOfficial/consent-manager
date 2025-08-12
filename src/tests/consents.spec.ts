@@ -40,7 +40,7 @@ let consumer2Base64: string;
 let contractbase64: string;
 let contract2base64: string;
 let privacyNoticeId: string;
-let dataProcessingId: string;
+let serviceChainId: string;
 let consentId: string;
 const token = crypto.randomUUID();
 
@@ -183,7 +183,7 @@ describe("Consent Routes Tests", function () {
       .empty;
     expect(response.body[0].dataProcessings[0]).to.have.property("catalogId");
 
-    dataProcessingId = response.body[0].dataProcessings[0].catalogId;
+    serviceChainId = response.body[0].dataProcessings[0].catalogId;
   });
 
   // getPrivacyNoticeById
@@ -202,7 +202,7 @@ describe("Consent Routes Tests", function () {
     expect(response.body).to.have.property("dataProcessings").to.be.not.empty;
     expect(response.body.dataProcessings[0]).to.have.property(
       "catalogId",
-      dataProcessingId
+      serviceChainId
     );
   });
 
@@ -214,7 +214,7 @@ describe("Consent Routes Tests", function () {
       .set("x-user-key", providerUserIdentifier)
       .send({
         privacyNoticeId: privacyNoticeId,
-        dataProcessingId: dataProcessingId,
+        serviceChainId: serviceChainId,
       })
       .expect(201);
     consentId = response.body.record.recordId;

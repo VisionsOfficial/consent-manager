@@ -56,7 +56,7 @@ export const ecosystemContractToPrivacyNotice = (
     title: contract.profile,
     lastUpdated: Date.now().toString(),
     dataProvider: "",
-    dataProcessings: contract.dataProcessings,
+    serviceChains: contract.serviceChains,
     controllerDetails: {
       name: "",
       contact: "",

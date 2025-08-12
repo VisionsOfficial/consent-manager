@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import {
   IConsent,
-  IDataProcessing,
+  IServiceChain,
   IParticipant,
   IPrivacyNotice,
   IUser,
@@ -43,7 +43,7 @@ type Policy = {
   prohibition: Permission[];
 };
 
-type DataProcessing = IDataProcessing;
+type ServiceChain = IServiceChain;
 
 export type BilateralContract = {
   _id: string;
@@ -73,7 +73,7 @@ export type EcosystemContract = {
   profile: string;
   ecosystem: string;
   orchestrator: string;
-  dataProcessings: DataProcessing[];
+  serviceChains: ServiceChain[];
   serviceOfferings: {
     participant: string;
     serviceOffering: string;

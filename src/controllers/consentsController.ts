@@ -373,7 +373,7 @@ export const giveConsent = async (
     const { privacyNoticeId, email } = req.body;
     let { data } = req.body;
     const { triggerDataExchange } = req.query;
-    const dataProcessingId: string = req.body.dataProcessingId;
+    const serviceChainId: string = req.body.serviceChainId;
 
     if (!privacyNoticeId) {
       throw new BadRequestError("Missing privacyNoticeId", [
@@ -394,6 +394,7 @@ export const giveConsent = async (
 
     const dataConsumerSD =
       privacyNotice.recipients.length > 0 ? privacyNotice.recipients[0] : null;
+
     const dataConsumer = await Participant.findOne({
       selfDescriptionURL: dataConsumerSD,
     }).lean();
@@ -449,7 +450,7 @@ export const giveConsent = async (
           dataConsumer,
           providerUserIdentifierDocument,
           data,
-          dataProcessingId,
+          serviceChainId,
         });
 
       if (registerNewUserToConsumerSideResponse.error) {
@@ -540,9 +541,9 @@ export const giveConsent = async (
           $nin: ["terminated", "revoked", "refused"],
         },
         recipientThirdParties:
-          dataProcessingId && privacyNotice?.dataProcessings.length > 0
-            ? privacyNotice?.dataProcessings.find(
-                (element) => element.catalogId.toString() === dataProcessingId
+          serviceChainId && privacyNotice?.serviceChains.length > 0
+            ? privacyNotice?.serviceChains.find(
+                (element) => element.catalogId.toString() === serviceChainId
               )
             : [],
       }).lean();
@@ -573,14 +574,15 @@ export const giveConsent = async (
         contract: privacyNotice.contract,
         event: [consentEvent.given],
         recipientThirdParties:
-          dataProcessingId && privacyNotice?.dataProcessings.length > 0
-            ? privacyNotice?.dataProcessings.find(
-                (element) => element.catalogId === dataProcessingId
+          serviceChainId && privacyNotice?.serviceChains.length > 0
+            ? privacyNotice?.serviceChains.find(
+                (element) => element.catalogId === serviceChainId
               )
             : [],
       });
 
       const newConsent = await consent.save();
+
       if (triggerDataExchange) {
         return await triggerDataExchangeByConsentId(newConsent._id, res);
       } else {
@@ -616,7 +618,7 @@ export const giveConsentUser = async (
     const { privacyNoticeId, email } = req.body;
     let { data } = req.body;
     const { triggerDataExchange } = req.query;
-    const dataProcessingId: string = req.body.dataProcessingId;
+    const serviceChainId: string = req.body.serviceChainId;
 
     if (!privacyNoticeId)
       throw new BadRequestError("Missing privacyNoticeId", [
@@ -737,7 +739,7 @@ export const giveConsentUser = async (
           dataConsumer,
           providerUserIdentifierDocument,
           data,
-          dataProcessingId,
+          serviceChainId,
         });
 
       if (registerNewUserToConsumerSideResponse.error) {
@@ -849,9 +851,9 @@ export const giveConsentUser = async (
       contract: privacyNotice.contract,
       event: [consentEvent.given],
       recipientThirdParties:
-        dataProcessingId && privacyNotice?.dataProcessings.length > 0
-          ? privacyNotice?.dataProcessings.find(
-              (element) => element.catalogId.toString() === dataProcessingId
+        serviceChainId && privacyNotice?.serviceChains.length > 0
+          ? privacyNotice?.serviceChains.find(
+              (element) => element.catalogId.toString() === serviceChainId
             )
           : [],
     });
@@ -887,7 +889,7 @@ export const giveConsentOnEmailValidation = async (
       consumerUserIdentifier,
       providerUser,
       consumerUser,
-      dataProcessingId,
+      serviceChainId,
     } = req.query;
     const decodedDP = decodeURIComponent(dataProvider.toString());
     const decodedDC = decodeURIComponent(dataConsumer.toString());
@@ -1031,9 +1033,9 @@ export const giveConsentOnEmailValidation = async (
       consumerUserIdentifier: consumerUserIdentifier,
       contract: pn.contract,
       event: [consentEvent.given],
-      recipientThirdParties: pn.dataProcessings
-        .find((element) => element.catalogId.toString() === dataProcessingId)
-        ?.infrastructureServices.map((infra) => infra.participant),
+      recipientThirdParties: pn.serviceChains
+        .find((element) => element.catalogId.toString() === serviceChainId)
+        ?.services.map((infra) => infra.participant),
     });
 
     await Promise.all([userToUpdate.save(), consent.save()]);
@@ -1583,7 +1585,7 @@ const registerNewUserToConsumerSide = async ({
   dataConsumer,
   providerUserIdentifierDocument,
   data,
-  dataProcessingId,
+  serviceChainId,
 }: {
   privacyNotice: IPrivacyNotice & { _id: string };
   req: any;
@@ -1592,7 +1594,7 @@ const registerNewUserToConsumerSide = async ({
   dataConsumer: any;
   providerUserIdentifierDocument: any;
   data: any;
-  dataProcessingId?: string;
+  serviceChainId?: string;
 }): Promise<{ consent?: any; error?: string; status: number }> => {
   //draft consent
   let consent;
@@ -1622,9 +1624,9 @@ const registerNewUserToConsumerSide = async ({
       consented: false,
       contract: privacyNotice.contract,
       event: [consentEvent.given],
-      recipientThirdParties: privacyNotice.dataProcessings
-        .find((element) => element.catalogId.toString() === dataProcessingId)
-        ?.infrastructureServices.map((infra) => infra.participant),
+      recipientThirdParties: privacyNotice.serviceChains
+        .find((element) => element.catalogId.toString() === serviceChainId)
+        ?.services.map((infra) => infra.participant),
     });
     await consent.save();
   } else {
