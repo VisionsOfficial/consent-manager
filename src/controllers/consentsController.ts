@@ -51,7 +51,7 @@ export const getUserConsents = async (
   next: NextFunction
 ) => {
   try {
-    const { limit = "10", page = "1" } = req.query;
+    const { limit = "10", page = "1", receipt = false } = req.query;
 
     const skip = (parseInt(page.toString()) - 1) * parseInt(limit.toString());
 
@@ -81,7 +81,11 @@ export const getUserConsents = async (
       consentReceipts.push(await consentToConsentReceipt(consent));
     }
 
-    res.json({ consents: consentReceipts, totalCount, totalPages });
+    res.json({
+      consents: receipt ? consents : consentReceipts,
+      totalCount,
+      totalPages,
+    });
   } catch (err) {
     next(err);
   }
