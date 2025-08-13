@@ -18,6 +18,7 @@
     "generateAES": "openssl rand -out src/config/keys/AESKey.pem -hex 16",
     "generatePublicKey": "openssl rsa -in src/config/keys/consentSignature.pem -outform PEM -pubout -out src/config/keys/consentSignaturePublic.pem",
     "copyKeys": "copyfiles --up 1 src/config/keys/* ./dist/src",
+    "postbuild": "pnpm copyKeys",
     "open:report": "open mochawesome-report/mochawesome.html"
   },
   "keywords": [
