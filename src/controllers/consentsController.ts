@@ -25,7 +25,7 @@ import * as CryptoJS from "crypto";
 import { readFileSync } from "fs";
 import path from "path";
 import crypto from "crypto";
-import _ from "lodash";
+import _, { fromPairs } from "lodash";
 import { MailchimpClient } from "../libs/emails/mailchimp/MailchimpClient";
 import { urlChecker } from "../utils/urlChecker";
 import { checkUserIdentifier } from "../utils/UserIdentifierMatchingProcessor";
@@ -374,7 +374,7 @@ export const giveConsent = async (
     const providerUserIdentifier = await UserIdentifier.findById(
       req.userIdentifier?.id
     ).lean();
-    const { privacyNoticeId, email } = req.body;
+    const { privacyNoticeId, email, event } = req.body;
     let { data } = req.body;
     const { triggerDataExchange } = req.query;
     const dataProcessingId: string = req.body.dataProcessingId;
@@ -562,29 +562,81 @@ export const giveConsent = async (
         }
       }
 
-      const consent = new Consent({
+      //Heritance verification
+      const parentConsent = await Consent.findOne({
         privacyNotice: privacyNotice._id,
-        user: userId,
-        providerUserIdentifier: providerUserIdentifier,
-        consumerUserIdentifier: consumerUserIdentifier,
-        dataProvider: dataProvider?._id,
-        dataConsumer: dataConsumer?._id,
-        recipients: privacyNotice.recipients,
-        purposes: [...privacyNotice.purposes],
+        status: { $in: ["revoked", "terminated"] },
         data: data?.length > 0 ? data : [...privacyNotice.data],
-        status: "granted",
-        consented: true,
-        contract: privacyNotice.contract,
-        event: [consentEvent.given],
-        recipientThirdParties:
-          dataProcessingId && privacyNotice?.dataProcessings.length > 0
-            ? privacyNotice?.dataProcessings.find(
-                (element) => element.catalogId === dataProcessingId
-              )
-            : [],
       });
+      let parentConsentId = null;
+      if (parentConsent) {
+        parentConsentId = parentConsent._id;
+      }
+
+      let consent;
+
+      if (event === "refused") {
+        consent = new Consent({
+          privacyNotice: privacyNotice._id,
+          user: userId,
+          providerUserIdentifier: providerUserIdentifier,
+          consumerUserIdentifier: consumerUserIdentifier,
+          dataProvider: dataProvider?._id,
+          dataConsumer: dataConsumer?._id,
+          recipients: privacyNotice.recipients,
+          purposes: [...privacyNotice.purposes],
+          data: data?.length > 0 ? data : [...privacyNotice.data],
+          status: "granted",
+          parent: parentConsentId,
+          consented: true,
+          contract: privacyNotice.contract,
+          event: [consentEvent.refused],
+          recipientThirdParties:
+            dataProcessingId && privacyNotice?.dataProcessings.length > 0
+              ? privacyNotice?.dataProcessings.find(
+                  (element) => element.catalogId === dataProcessingId
+                )
+              : [],
+        });
+      } else if (event === "given") {
+        consent = new Consent({
+          privacyNotice: privacyNotice._id,
+          user: userId,
+          providerUserIdentifier: providerUserIdentifier,
+          consumerUserIdentifier: consumerUserIdentifier,
+          dataProvider: dataProvider?._id,
+          dataConsumer: dataConsumer?._id,
+          recipients: privacyNotice.recipients,
+          purposes: [...privacyNotice.purposes],
+          data: data?.length > 0 ? data : [...privacyNotice.data],
+          status: "granted",
+          parent: parentConsentId,
+          consented: true,
+          contract: privacyNotice.contract,
+          event: [consentEvent.given],
+          recipientThirdParties:
+            dataProcessingId && privacyNotice?.dataProcessings.length > 0
+              ? privacyNotice?.dataProcessings.find(
+                  (element) => element.catalogId === dataProcessingId
+                )
+              : [],
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ error: "Wrong event type, expected 'given' or 'refused'" });
+      }
 
       const newConsent = await consent.save();
+
+      if (parentConsent) {
+        await parentConsent.updateOne({
+          $push: {
+            children: newConsent._id,
+          },
+        });
+      }
+
       if (triggerDataExchange) {
         return await triggerDataExchangeByConsentId(newConsent._id, res);
       } else {
@@ -617,7 +669,7 @@ export const giveConsentUser = async (
     }>([{ path: "identifiers" }]);
     if (!user) return res.status(404).json({ error: "user not found" });
 
-    const { privacyNoticeId, email } = req.body;
+    const { privacyNoticeId, email, event } = req.body;
     let { data } = req.body;
     const { triggerDataExchange } = req.query;
     const dataProcessingId: string = req.body.dataProcessingId;
@@ -838,29 +890,79 @@ export const giveConsentUser = async (
       }
     }
 
-    const consent = new Consent({
+    //Heritance verification
+    const parentConsent = await Consent.findOne({
       privacyNotice: privacyNotice._id,
-      user: userId,
-      providerUserIdentifier: providerUserIdentifier,
-      consumerUserIdentifier: consumerUserIdentifier,
-      dataProvider: dataProvider?._id,
-      dataConsumer: dataConsumer?._id,
-      recipients: privacyNotice.recipients,
-      purposes: [...privacyNotice.purposes],
+      status: { $in: ["revoked", "terminated"] },
       data: data?.length > 0 ? data : [...privacyNotice.data],
-      status: "granted",
-      consented: true,
-      contract: privacyNotice.contract,
-      event: [consentEvent.given],
-      recipientThirdParties:
-        dataProcessingId && privacyNotice?.dataProcessings.length > 0
-          ? privacyNotice?.dataProcessings.find(
-              (element) => element.catalogId.toString() === dataProcessingId
-            )
-          : [],
+      child: null,
     });
+    let parentConsentId = null;
+    if (parentConsent) {
+      parentConsentId = parentConsent._id;
+    }
+
+    let consent;
+
+    if (event === "refused") {
+      consent = new Consent({
+        privacyNotice: privacyNotice._id,
+        user: userId,
+        providerUserIdentifier: providerUserIdentifier,
+        consumerUserIdentifier: consumerUserIdentifier,
+        dataProvider: dataProvider?._id,
+        dataConsumer: dataConsumer?._id,
+        recipients: privacyNotice.recipients,
+        purposes: [...privacyNotice.purposes],
+        parent: parentConsentId,
+        data: data?.length > 0 ? data : [...privacyNotice.data],
+        status: "granted",
+        consented: true,
+        contract: privacyNotice.contract,
+        event: [consentEvent.refused],
+        recipientThirdParties:
+          dataProcessingId && privacyNotice?.dataProcessings.length > 0
+            ? privacyNotice?.dataProcessings.find(
+                (element) => element.catalogId.toString() === dataProcessingId
+              )
+            : [],
+      });
+    } else if (event === "given") {
+      consent = new Consent({
+        privacyNotice: privacyNotice._id,
+        user: userId,
+        providerUserIdentifier: providerUserIdentifier,
+        consumerUserIdentifier: consumerUserIdentifier,
+        dataProvider: dataProvider?._id,
+        dataConsumer: dataConsumer?._id,
+        recipients: privacyNotice.recipients,
+        purposes: [...privacyNotice.purposes],
+        parent: parentConsentId,
+        data: data?.length > 0 ? data : [...privacyNotice.data],
+        status: "granted",
+        consented: true,
+        contract: privacyNotice.contract,
+        event: [consentEvent.given],
+        recipientThirdParties:
+          dataProcessingId && privacyNotice?.dataProcessings.length > 0
+            ? privacyNotice?.dataProcessings.find(
+                (element) => element.catalogId.toString() === dataProcessingId
+              )
+            : [],
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ error: "Wrong event type, expected 'given' or 'refused'" });
+    }
 
     const newConsent = await consent.save();
+
+    if (parentConsent) {
+      await parentConsent.updateOne({
+        child: newConsent._id,
+      });
+    }
 
     if (triggerDataExchange) {
       return await triggerDataExchangeByConsentId(newConsent._id, res);
@@ -1931,6 +2033,7 @@ export const reConfirmConsent = async (
   next: NextFunction
 ) => {
   try {
+    const { triggerDataExchange } = req.query;
     const { consentId } = req.params;
     const consent = await Consent.findOne({
       _id: consentId,
@@ -1941,7 +2044,12 @@ export const reConfirmConsent = async (
     if (!consent) return res.status(404).json({ error: "consent not found" });
     consent.event.push(consentEvent.reConfirmed);
     consent.save();
-    return res.status(200).json(await consentToConsentReceipt(consent));
+
+    if (triggerDataExchange) {
+      return await triggerDataExchangeByConsentId(consent._id, res);
+    } else {
+      return res.status(200).json(await consentToConsentReceipt(consent));
+    }
   } catch (err) {
     Logger.error(err);
     next(err);
