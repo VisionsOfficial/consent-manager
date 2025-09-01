@@ -215,8 +215,10 @@ describe("Consent Routes Tests", function () {
       .send({
         privacyNoticeId: privacyNoticeId,
         dataProcessingId: dataProcessingId,
+        event: "given",
       })
       .expect(201);
+
     consentId = response.body.record.recordId;
     expect(response.body.event[0].eventState).to.equal("consent given");
     expect(response.body.piiProcessing.privacyNotice).to.equal(privacyNoticeId);
@@ -347,7 +349,7 @@ describe("Consent Routes Tests", function () {
     setupnockMocks(providerBase64);
     const response = await supertest(serverInstance.app)
       .post(`/v1/consents/user`)
-      .send({ privacyNoticeId: privacyNoticeId })
+      .send({ privacyNoticeId: privacyNoticeId, event: "given" })
       .set("Authorization", userJwt)
       .expect(201);
     expect(response.body.event[0].eventState).to.equal("consent given");
