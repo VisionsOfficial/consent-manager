@@ -142,6 +142,7 @@ r.get("/pdi/iframe", verifyParticipantJWT, async (req, res) => {
 
   if (process.env.PDI_ENDPOINT) {
     const privacyNoticeId = req.query.privacyNoticeId;
+    const userIdentifier = req.query.userIdentifier;
     let consent = null;
     if (privacyNoticeId) {
       consent = await Consent.findOne({
@@ -150,6 +151,10 @@ r.get("/pdi/iframe", verifyParticipantJWT, async (req, res) => {
           $nin: ["terminated", "revoked"],
         },
         child: { $exists: false },
+        $or: [
+          { providerUserIdentifier: userIdentifier },
+          { consumerUserIdentifier: null },
+        ],
       });
     }
 
