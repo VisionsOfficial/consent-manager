@@ -42,6 +42,15 @@ const AESKey = readFileSync(
   path.join(__dirname, "..", "config", "keys", "AESKey.pem")
 );
 
+async function populateDeep(doc: any, depth = 5) {
+  if (!doc || depth === 0) return doc;
+  await doc.populate("child");
+  if (doc.child) {
+    doc.child = await populateDeep(doc.child, depth - 1);
+  }
+  return doc;
+}
+
 /**
  * Gets the list of given consents of a user
  */
@@ -56,6 +65,7 @@ export const getUserConsents = async (
       page = "1",
       receipt = false,
       all = false,
+      history = false,
     } = req.query;
 
     const skip = (parseInt(page.toString()) - 1) * parseInt(limit.toString());
@@ -65,8 +75,14 @@ export const getUserConsents = async (
       $and: and,
     };
 
+    //by default return always the last consent the one with no child
     if (!all) {
       filters["$and"].push({ child: { $exists: false } });
+    }
+
+    //if the history query params is true return the original consent the one with no parent
+    if (history) {
+      filters["$and"].push({ parent: { $exists: false } });
     }
 
     let consents;
@@ -76,6 +92,16 @@ export const getUserConsents = async (
       consents = await Consent.find(filters)
         .skip(skip)
         .limit(parseInt(limit.toString()));
+
+      //if history deeply populate all child of consents
+      if (history) {
+        const tmp = [];
+        for (const doc of consents) {
+          tmp.push(await populateDeep(doc));
+        }
+
+        consents = tmp;
+      }
     } else if (req.userIdentifier && req.userIdentifier?.id) {
       filters["$and"].push({
         $or: [
@@ -83,9 +109,19 @@ export const getUserConsents = async (
           { providerUserIdentifier: req.userIdentifier?.id },
         ],
       });
+
       consents = await Consent.find(filters)
         .skip(skip)
         .limit(parseInt(limit.toString()));
+
+      if (history) {
+        const tmp = [];
+        for (const doc of consents) {
+          tmp.push(await populateDeep(doc));
+        }
+
+        consents = tmp;
+      }
     }
 
     const totalCount = await Consent.countDocuments();
