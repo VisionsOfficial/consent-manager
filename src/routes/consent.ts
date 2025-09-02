@@ -153,7 +153,7 @@ r.get("/pdi/iframe", verifyParticipantJWT, async (req, res) => {
         child: { $exists: false },
         $or: [
           { providerUserIdentifier: userIdentifier },
-          { consumerUserIdentifier: null },
+          { consumerUserIdentifier: userIdentifier },
         ],
       });
     }
