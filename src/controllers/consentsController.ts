@@ -51,22 +51,39 @@ export const getUserConsents = async (
   next: NextFunction
 ) => {
   try {
-    const { limit = "10", page = "1", receipt = false } = req.query;
+    const {
+      limit = "10",
+      page = "1",
+      receipt = false,
+      all = false,
+    } = req.query;
 
     const skip = (parseInt(page.toString()) - 1) * parseInt(limit.toString());
 
+    const and: any[] = [];
+    const filters = {
+      $and: and,
+    };
+
+    if (!all) {
+      filters["$and"].push({ child: { $exists: false } });
+    }
+
     let consents;
     if (req.user && req.user?.id) {
-      consents = await Consent.find({ user: req.user?.id })
+      filters["$and"].push({ user: req.user?.id });
+
+      consents = await Consent.find(filters)
         .skip(skip)
         .limit(parseInt(limit.toString()));
     } else if (req.userIdentifier && req.userIdentifier?.id) {
-      consents = await Consent.find({
+      filters["$and"].push({
         $or: [
           { consumerUserIdentifier: req.userIdentifier?.id },
           { providerUserIdentifier: req.userIdentifier?.id },
         ],
-      })
+      });
+      consents = await Consent.find(filters)
         .skip(skip)
         .limit(parseInt(limit.toString()));
     }
