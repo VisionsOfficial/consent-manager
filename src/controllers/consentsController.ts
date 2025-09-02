@@ -591,6 +591,7 @@ export const giveConsent = async (
         privacyNotice: privacyNotice._id,
         status: { $in: ["revoked", "terminated"] },
         data: data?.length > 0 ? data : [...privacyNotice.data],
+        user: userId,
       });
       let parentConsentId = null;
       if (parentConsent) {
@@ -926,6 +927,7 @@ export const giveConsentUser = async (
       status: { $in: ["revoked", "terminated"] },
       data: data?.length > 0 ? data : [...privacyNotice.data],
       child: null,
+      user: userId,
     });
     let parentConsentId = null;
     if (parentConsent) {
