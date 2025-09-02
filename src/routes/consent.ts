@@ -27,9 +27,6 @@ import {
 } from "../middleware/auth";
 // import { checkIDFormatMiddleware } from "../middleware/objectIdFormatCheck";
 import { setUserIdForParticipant } from "../middleware/participantsMiddleware";
-import Consent from "../models/Consent/Consent.model";
-import { ObjectId } from "mongodb";
-import mongoose from "mongoose";
 const r: Router = Router();
 
 r.get("/emailverification", giveConsentOnEmailValidation);
