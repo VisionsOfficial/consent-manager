@@ -2079,3 +2079,85 @@ export const terminateConsent = async (
     next(err);
   }
 };
+
+/**
+ * @description redirect to the PDI frontend if ENV var configured
+ * @param req
+ * @param res
+ * @param next
+ */
+export const redirectPDI = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (process.env.PDI_ENDPOINT) {
+      const { privacyNoticeId, userIdentifier } = req.query;
+      let consent = null;
+
+      if (privacyNoticeId) {
+        consent = await Consent.findOne({
+          $and: [
+            {
+              privacyNotice: new mongoose.Types.ObjectId(
+                privacyNoticeId.toString()
+              ),
+            },
+            {
+              status: {
+                $nin: ["terminated", "revoked"],
+              },
+            },
+            {
+              child: { $exists: false },
+            },
+            {
+              $or: [
+                {
+                  providerUserIdentifier: new mongoose.Types.ObjectId(
+                    userIdentifier.toString()
+                  ),
+                },
+                {
+                  consumerUserIdentifier: new mongoose.Types.ObjectId(
+                    userIdentifier.toString()
+                  ),
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      if (consent) {
+        res.redirect(
+          `${process.env.PDI_ENDPOINT}?userIdentifier=${
+            req.query.userIdentifier
+          }&participant=${req.session?.userParticipant.id}${
+            req.query.privacyNoticeId
+              ? `&privacyNoticeId=${req.query.privacyNoticeId}`
+              : ""
+          }&consentId=${consent.id}`
+        );
+      } else {
+        res.redirect(
+          `${process.env.PDI_ENDPOINT}?userIdentifier=${
+            req.query.userIdentifier
+          }&participant=${req.session?.userParticipant.id}${
+            req.query.privacyNoticeId
+              ? `&privacyNoticeId=${req.query.privacyNoticeId}`
+              : ""
+          }`
+        );
+      }
+    } else {
+      res.status(400).json({
+        message: "No PDI endpoint setup.",
+      });
+    }
+  } catch (err) {
+    Logger.error(err);
+    next(err);
+  }
+};

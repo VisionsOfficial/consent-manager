@@ -12,6 +12,7 @@ import {
   giveConsentOnEmailValidation,
   giveConsentUser,
   reConfirmConsent,
+  redirectPDI,
   refuseConsent,
   resumeConsent,
   revokeConsent,
@@ -27,6 +28,8 @@ import {
 // import { checkIDFormatMiddleware } from "../middleware/objectIdFormatCheck";
 import { setUserIdForParticipant } from "../middleware/participantsMiddleware";
 import Consent from "../models/Consent/Consent.model";
+import { ObjectId } from "mongodb";
+import mongoose from "mongoose";
 const r: Router = Router();
 
 r.get("/emailverification", giveConsentOnEmailValidation);
@@ -136,49 +139,6 @@ r.post(
   terminateConsent
 );
 
-r.get("/pdi/iframe", verifyParticipantJWT, async (req, res) => {
-  // let parsedUrl = url.parse(req.url);
-  // res.set("Authorization", `Bearer ${req.query.participant}`);
-
-  if (process.env.PDI_ENDPOINT) {
-    const privacyNoticeId = req.query.privacyNoticeId;
-    let consent = null;
-    if (privacyNoticeId) {
-      consent = await Consent.findOne({
-        privacyNoticeId: privacyNoticeId,
-        status: {
-          $nin: ["terminated", "revoked"],
-        },
-        child: { $exists: false },
-      });
-    }
-
-    if (consent) {
-      res.redirect(
-        `${process.env.PDI_ENDPOINT}?userIdentifier=${
-          req.query.userIdentifier
-        }&participant=${req.session?.userParticipant.id}${
-          req.query.privacyNoticeId
-            ? `&privacyNoticeId=${req.query.privacyNoticeId}`
-            : ""
-        }&consentId=${consent.id}`
-      );
-    } else {
-      res.redirect(
-        `${process.env.PDI_ENDPOINT}?userIdentifier=${
-          req.query.userIdentifier
-        }&participant=${req.session?.userParticipant.id}${
-          req.query.privacyNoticeId
-            ? `&privacyNoticeId=${req.query.privacyNoticeId}`
-            : ""
-        }`
-      );
-    }
-  } else {
-    res.json({
-      message: "No PDI endpoint setup.",
-    });
-  }
-});
+r.get("/pdi/iframe", verifyParticipantJWT, redirectPDI);
 
 export default r;
