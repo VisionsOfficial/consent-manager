@@ -25,7 +25,7 @@ import * as CryptoJS from "crypto";
 import { readFileSync } from "fs";
 import path from "path";
 import crypto from "crypto";
-import _, { fromPairs } from "lodash";
+import _ from "lodash";
 import { MailchimpClient } from "../libs/emails/mailchimp/MailchimpClient";
 import { urlChecker } from "../utils/urlChecker";
 import { checkUserIdentifier } from "../utils/UserIdentifierMatchingProcessor";
@@ -392,7 +392,14 @@ export const giveConsent = async (
       req.userIdentifier?.id
     ).lean();
     const { privacyNoticeId, email, event } = req.body;
+
     let { data } = req.body;
+    if (data.length === 0) {
+      throw new BadRequestError("Data are empty", [
+        { field: "data", message: "can't be empty" },
+      ]);
+    }
+
     const { triggerDataExchange } = req.query;
     const dataProcessingId: string = req.body.dataProcessingId;
 
@@ -688,6 +695,12 @@ export const giveConsentUser = async (
 
     const { privacyNoticeId, email, event } = req.body;
     let { data } = req.body;
+
+    if (data.length === 0) {
+      throw new BadRequestError("Data are empty", [
+        { field: "data", message: "can't be empty" },
+      ]);
+    }
     const { triggerDataExchange } = req.query;
     const dataProcessingId: string = req.body.dataProcessingId;
 
@@ -2060,7 +2073,7 @@ export const reConfirmConsent = async (
     });
     if (!consent) return res.status(404).json({ error: "consent not found" });
     consent.event.push(consentEvent.reConfirmed);
-    consent.save();
+    await consent.save();
 
     if (triggerDataExchange) {
       return await triggerDataExchangeByConsentId(consent._id, res);
