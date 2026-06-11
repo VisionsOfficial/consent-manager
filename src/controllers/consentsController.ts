@@ -505,7 +505,31 @@ export const giveConsent = async (
         triggerDataExchange,
       });
 
-      if (emailReattachedResponse.status !== 200) {
+      if (emailReattachedResponse?.case === "no-consumer-identifier") {
+        // Consumer has never registered this user: auto-register them on the
+        // consumer side (consumer DSC -> registrationUri) instead of failing.
+        const registerNewUserToConsumerSideResponse =
+          await registerNewUserToConsumerSide({
+            privacyNotice,
+            req,
+            providerUserIdentifier,
+            dataProvider,
+            dataConsumer,
+            providerUserIdentifierDocument,
+            data,
+            dataProcessingId,
+          });
+
+        if (registerNewUserToConsumerSideResponse.error) {
+          return res
+            .status(registerNewUserToConsumerSideResponse?.status)
+            .json(registerNewUserToConsumerSideResponse?.error);
+        } else {
+          return res
+            .status(registerNewUserToConsumerSideResponse?.status)
+            .json(registerNewUserToConsumerSideResponse?.consent);
+        }
+      } else if (emailReattachedResponse.status !== 200) {
         return res
           .status(emailReattachedResponse?.status)
           .json(emailReattachedResponse?.message);
@@ -852,7 +876,31 @@ export const giveConsentUser = async (
         triggerDataExchange,
       });
 
-      if (emailReattachedResponse.status !== 200) {
+      if (emailReattachedResponse?.case === "no-consumer-identifier") {
+        // Consumer has never registered this user: auto-register them on the
+        // consumer side (consumer DSC -> registrationUri) instead of failing.
+        const registerNewUserToConsumerSideResponse =
+          await registerNewUserToConsumerSide({
+            privacyNotice,
+            req,
+            providerUserIdentifier,
+            dataProvider,
+            dataConsumer,
+            providerUserIdentifierDocument,
+            data,
+            dataProcessingId,
+          });
+
+        if (registerNewUserToConsumerSideResponse.error) {
+          return res
+            .status(registerNewUserToConsumerSideResponse?.status)
+            .json(registerNewUserToConsumerSideResponse?.error);
+        } else {
+          return res
+            .status(registerNewUserToConsumerSideResponse?.status)
+            .json(registerNewUserToConsumerSideResponse?.consent);
+        }
+      } else if (emailReattachedResponse.status !== 200) {
         return res
           .status(emailReattachedResponse?.status)
           .json(emailReattachedResponse?.message);
@@ -1733,7 +1781,7 @@ const registerNewUserToConsumerSide = async ({
   dataProcessingId?: string;
 }): Promise<{ consent?: any; error?: string; status: number }> => {
   //draft consent
-  let consent;
+  let consent: any;
   const verifyDraftConsent = await Consent.findOne({
     privacyNotice: privacyNotice._id,
     providerUserIdentifier: providerUserIdentifier,
@@ -1746,6 +1794,10 @@ const registerNewUserToConsumerSide = async ({
     consented: false,
     contract: privacyNotice.contract,
   });
+
+  // Whether this call created the draft/pending consent. Used to clean it up if
+  // contacting the consumer side fails, so we never leave an orphan behind.
+  const createdHere = !verifyDraftConsent;
 
   if (!verifyDraftConsent) {
     consent = new Consent({
@@ -1769,21 +1821,29 @@ const registerNewUserToConsumerSide = async ({
     consent = verifyDraftConsent;
   }
 
-  // call new dsc endpoint
-  //login
-  const consumerLogin = await axios.post(
-    urlChecker(dataConsumer.dataspaceEndpoint, "login"),
-    {
-      serviceKey: dataConsumer.clientID,
-      secretKey: dataConsumer.clientSecret,
-    },
-    {
-      headers: { "Content-Type": "application/json" },
+  // Delete the draft/pending consent we just created when the consumer side
+  // cannot be reached, so failed attempts don't accumulate orphan consents.
+  const cleanupOrphanConsent = async () => {
+    if (createdHere && consent?._id) {
+      await Consent.deleteOne({ _id: consent._id });
     }
-  );
+  };
 
   //post to register user app side
   try {
+    // call new dsc endpoint
+    //login
+    const consumerLogin = await axios.post(
+      urlChecker(dataConsumer.dataspaceEndpoint, "login"),
+      {
+        serviceKey: dataConsumer.clientID,
+        secretKey: dataConsumer.clientSecret,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
     const consumerRegisterUserAppSide = await axios.post(
       urlChecker(dataConsumer.dataspaceEndpoint, "private/users/app"),
       {
@@ -1803,7 +1863,15 @@ const registerNewUserToConsumerSide = async ({
         consent,
       };
     }
+
+    // Consumer reached but responded with an unexpected (non-200) status.
+    await cleanupOrphanConsent();
+    return {
+      status: 400,
+      error: "Registration Error.",
+    };
   } catch (e) {
+    await cleanupOrphanConsent();
     if (e?.response?.status === 404) {
       return {
         status: 400,
@@ -1856,9 +1924,13 @@ const emailReattached = async ({
   );
 
   if (!existingConsumerUserIdentifier) {
+    // The consumer has no identifier for this email at all (brand-new user the
+    // consumer doesn't know yet). Flag the case so callers can route it to
+    // consumer-side auto-registration instead of dead-ending here.
     return {
       message: "No user identifier found in the consumer for email " + email,
       status: 404,
+      case: "no-consumer-identifier",
     };
   } else {
     // User identifier found but not attached to the main user, requires user validation
@@ -2137,9 +2209,11 @@ export const redirectPDI = async (
               ),
             },
             {
-              status: {
-                $nin: ["terminated", "revoked"],
-              },
+              // Only an actionable (granted) consent should be surfaced to the
+              // iframe as an editable consentId. draft/pending consents are
+              // internal, user-less placeholders and would wrongly flip the UI
+              // to "Reconfirmer" for a brand-new user.
+              status: "granted",
             },
             {
               child: { $exists: false },

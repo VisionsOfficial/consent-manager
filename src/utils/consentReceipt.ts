@@ -28,7 +28,7 @@ export const consentToConsentReceipt = async (
     record: {
       schemaVersion: consent.schema_version,
       recordId: consent._id,
-      piiPrincipalId: consent.user.toString(),
+      piiPrincipalId: consent.user?.toString() ?? null,
     },
     piiProcessing: {
       privacyNotice: consent.privacyNotice.toString(),
