@@ -149,7 +149,8 @@ export const verifyUserJWT = async (
     });
 
     if (userExisitingIdentifier) {
-      req.userIdentifier = {
+      // A User already links this identifier — authenticate as that User.
+      req.user = {
         id: userExisitingIdentifier._id,
       };
       next();
@@ -159,9 +160,14 @@ export const verifyUserJWT = async (
       });
 
       if (!userExisitingEmail) {
-        return res
-          .status(401)
-          .json({ message: "User with email doesn't exist" });
+        // No User links this identifier yet (e.g. the user is registered on
+        // only one side of the contract). Don't reject — carry the resolved
+        // userIdentifier so the controller can resolve it and drive
+        // consumer-side registration.
+        req.userIdentifier = {
+          id: userIdentifier._id,
+        };
+        return next();
       }
 
       if (
