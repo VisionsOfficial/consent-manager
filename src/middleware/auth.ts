@@ -159,6 +159,13 @@ export const verifyUserJWT = async (
       // a child account without a password may legitimately share its email with
       // a guardian (or another user), and silently attaching this identifier to
       // an incomplete account would entangle distinct accounts.
+      if (!userIdentifier.email) {
+        req.userIdentifier = {
+          id: userIdentifier._id,
+        };
+        return next();
+      }
+
       const userExisitingEmail = await User.findOne({
         email: userIdentifier.email,
         $or: [
