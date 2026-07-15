@@ -262,6 +262,14 @@ export const registerUserIdentifier = async (
           { field: "legal_guardian", message: "Parent user not found" },
         ]);
       }
+      if (!parent.email) {
+        throw new BadRequestError("Missing or invalid fields", [
+          {
+            field: "legal_guardian",
+            message: "Guardian must have an email to validate guardianship",
+          },
+        ]);
+      }
 
       const rawToken = crypto.randomBytes(32).toString("hex");
       await PendingGuardianship.create({

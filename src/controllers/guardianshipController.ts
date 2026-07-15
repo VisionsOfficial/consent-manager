@@ -300,10 +300,15 @@ export const getChildConsents = async (
       "returning receipt?",
       receipt
     );
-    console.log(
-      "[getChildConsents] First receipt structure:",
-      JSON.stringify(consentReceipts[0], null, 2).substring(0, 500)
-    );
+    if (consentReceipts.length > 0) {
+      Logger.debug(
+        `[getChildConsents] First receipt structure: ${JSON.stringify(
+          consentReceipts[0],
+          null,
+          2
+        ).substring(0, 500)}`
+      );
+    }
 
     return res.status(200).json({
       consents: receipt ? consents : consentReceipts,

@@ -54,11 +54,9 @@ const template = (vars: { [key: string]: string }) => `<!DOCTYPE html>
                 browser:<br />
                 <a href='${vars.claimUrl}'>${vars.claimUrl}</a>
             </p>
-            <button>
-                <a href='${
-                  vars.claimUrl
-                }' style="text-decoration: none; color: inherit;">Activate my account</a>
-            </button>
+            <a href='${
+              vars.claimUrl
+            }' style="display:inline-block; background-color:#007bff; color:#fff; padding:10px 20px; border-radius:5px; text-decoration:none;">Activate my account</a>
         </div>
     </body>
 </html>
