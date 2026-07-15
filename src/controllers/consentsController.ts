@@ -1031,8 +1031,8 @@ export const giveConsentUser = async (
         purposes: [...privacyNotice.purposes],
         parent: parentConsentId,
         data: data?.length > 0 ? data : [...privacyNotice.data],
-        status: "granted",
-        consented: true,
+        status: "refused",
+        consented: false,
         contract: privacyNotice.contract,
         event: [{ ...consentEvent.refused, ...(onBehalf?.eventMeta ?? {}) }],
         recipientThirdParties:
