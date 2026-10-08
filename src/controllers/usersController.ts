@@ -231,7 +231,7 @@ export const registerUserIdentifier = async (
       email,
       identifier,
       url,
-      legal_guardian,
+      legalGuardian,
       callbackUrl,
     } = req.body;
     if (!email && !identifier)
@@ -246,26 +246,31 @@ export const registerUserIdentifier = async (
     // -----------------------------------------------------------------------
     // Guardianship flow: delegate creation to parent email confirmation
     // -----------------------------------------------------------------------
-    if (legal_guardian) {
+    if (legalGuardian) {
       if (!callbackUrl) {
         throw new BadRequestError("Missing or invalid fields", [
           {
             field: "callbackUrl",
-            message: "callbackUrl is required when legal_guardian is set",
+            message: "callbackUrl is required when legalGuardian is set",
           },
         ]);
       }
 
-      const parent = await User.findById(legal_guardian).lean();
+      const isObjectId = mongoose.Types.ObjectId.isValid(legalGuardian);
+      const parent = await User.findOne(
+        isObjectId
+          ? { $or: [{ _id: legalGuardian }, { email: legalGuardian }] }
+          : { email: legalGuardian }
+      ).lean();
       if (!parent) {
         throw new BadRequestError("Missing or invalid fields", [
-          { field: "legal_guardian", message: "Parent user not found" },
+          { field: "legalGuardian", message: "Parent user not found" },
         ]);
       }
       if (!parent.email) {
         throw new BadRequestError("Missing or invalid fields", [
           {
-            field: "legal_guardian",
+            field: "legalGuardian",
             message: "Guardian must have an email to validate guardianship",
           },
         ]);
@@ -279,7 +284,7 @@ export const registerUserIdentifier = async (
         email,
         identifier,
         url,
-        parentId: legal_guardian,
+        parentId: parent._id,
         callbackUrl,
         token: hashToken(rawToken),
         expiresAt: new Date(Date.now() + PENDING_GUARDIANSHIP_TTL_MS),

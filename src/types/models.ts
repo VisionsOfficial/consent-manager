@@ -128,7 +128,7 @@ export interface IUser extends Document, AllSchemas {
   /**
    * Reference to the guardian User who manages this account.
    * Set when a dataspace connector registers a child userIdentifier with
-   * legal_guardian, and the parent validates via email.
+   * legalGuardian, and the parent validates via email.
    */
   guardian?: Types.ObjectId | null;
 
