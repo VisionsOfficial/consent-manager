@@ -12,8 +12,8 @@ import { testUser1, testUser2, testProvider1 } from "./fixtures/testAccount";
  * Guardianship feature tests — v2 (guardian field on User, no GuardianRelationship).
  *
  * Covers:
- *  - POST /users/register with legal_guardian → 202 + PendingGuardianship created
- *  - POST /users/register with invalid legal_guardian → 400
+ *  - POST /users/register with legalGuardian → 202 + PendingGuardianship created
+ *  - POST /users/register with invalid legalGuardian → 400
  *  - GET  /guardianship/validate/:token (public) → email or 400
  *  - POST /guardianship/validate/:token (authenticated parent) → 200, 403
  *  - listChildren / getChild
@@ -133,10 +133,10 @@ describe("Guardianship Routes Tests", function () {
   });
 
   // ---------------------------------------------------------------------------
-  // POST /v1/users/register with legal_guardian — new connector flow
+  // POST /v1/users/register with legalGuardian — new connector flow
   // ---------------------------------------------------------------------------
-  describe("POST /v1/users/register with legal_guardian", () => {
-    it("should return 202 and create a PendingGuardianship when legal_guardian is valid", async () => {
+  describe("POST /v1/users/register with legalGuardian", () => {
+    it("should return 202 and create a PendingGuardianship when legalGuardian is valid", async () => {
       const res = await supertest(serverInstance.app)
         .post("/v1/users/register")
         .set("Authorization", participantJwt)
@@ -144,7 +144,7 @@ describe("Guardianship Routes Tests", function () {
           email: "new-child@guardianship.test",
           identifier: "new-child-001",
           url: "http://connector.test/users/new-child-001",
-          legal_guardian: parentAId,
+          legalGuardian: parentAId,
           callbackUrl: "http://connector.test/webhook/user-identifier",
         })
         .expect(202);
@@ -163,40 +163,40 @@ describe("Guardianship Routes Tests", function () {
       );
     });
 
-    it("should return 400 when legal_guardian is not a valid ObjectId", async () => {
+    it("should return 400 when legalGuardian is not a valid ObjectId", async () => {
       await supertest(serverInstance.app)
         .post("/v1/users/register")
         .set("Authorization", participantJwt)
         .send({
           email: "another-child@guardianship.test",
           identifier: "another-001",
-          legal_guardian: "not-an-objectid",
+          legalGuardian: "not-an-objectid",
           callbackUrl: "http://connector.test/webhook/user-identifier",
         })
         .expect(400);
     });
 
-    it("should return 400 when legal_guardian references a non-existent user", async () => {
+    it("should return 400 when legalGuardian references a non-existent user", async () => {
       await supertest(serverInstance.app)
         .post("/v1/users/register")
         .set("Authorization", participantJwt)
         .send({
           email: "yet-another@guardianship.test",
           identifier: "yet-001",
-          legal_guardian: new mongoose.Types.ObjectId().toString(),
+          legalGuardian: new mongoose.Types.ObjectId().toString(),
           callbackUrl: "http://connector.test/webhook/user-identifier",
         })
         .expect(400);
     });
 
-    it("should return 400 when legal_guardian is present but callbackUrl is missing", async () => {
+    it("should return 400 when legalGuardian is present but callbackUrl is missing", async () => {
       await supertest(serverInstance.app)
         .post("/v1/users/register")
         .set("Authorization", participantJwt)
         .send({
           email: "missing-callback@guardianship.test",
           identifier: "missing-001",
-          legal_guardian: parentAId,
+          legalGuardian: parentAId,
         })
         .expect(400);
     });
