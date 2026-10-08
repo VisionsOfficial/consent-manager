@@ -155,8 +155,23 @@ export const verifyUserJWT = async (
       };
       next();
     } else {
+      // Exclude incomplete guardian-managed accounts from the email-based auto-link:
+      // a child account without a password may legitimately share its email with
+      // a guardian (or another user), and silently attaching this identifier to
+      // an incomplete account would entangle distinct accounts.
+      if (!userIdentifier.email) {
+        req.userIdentifier = {
+          id: userIdentifier._id,
+        };
+        return next();
+      }
+
       const userExisitingEmail = await User.findOne({
         email: userIdentifier.email,
+        $or: [
+          { guardian: { $eq: null } }, // Autonomous user
+          { password: { $exists: true } }, // OR completed account
+        ],
       });
 
       if (!userExisitingEmail) {
