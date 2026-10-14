@@ -14,7 +14,11 @@ import { userToSelfDescription } from "../libs/jsonld/selfDescriptions";
 import { consentEvent } from "../utils/consentEvent";
 import { consentToConsentReceipt } from "../utils/consentReceipt";
 import { checkUserIdentifier } from "../utils/UserIdentifierMatchingProcessor";
-import { giveConsentUser, GiveConsentOnBehalf } from "./consentsController";
+import {
+  giveConsentUser,
+  GiveConsentOnBehalf,
+  triggerDataExchangeByConsentId,
+} from "./consentsController";
 import {
   notifyGuardianAction,
   sendGuardianInvite,
@@ -105,20 +109,36 @@ export const confirmGuardianship = async (
     });
     await userIdentifier.save();
 
-    // Create the child User with guardian reference
-    const child = new User({
+    // Reuse the existing User if any, otherwise create the child User
+    let child = await User.findOne({
       firstName: pending.firstName,
       lastName: pending.lastName,
-      email: pending.email,
       guardian: parentId,
-      identifiers: [userIdentifier._id],
+      ...(pending.email ? { email: pending.email } : {}),
     });
-    child.jsonld = userToSelfDescription(child);
-    await child.save();
 
-    // Back-link the userIdentifier to the child user
-    userIdentifier.user = child._id;
-    await userIdentifier.save();
+    if (child) {
+      const alreadyLinked = (child.identifiers ?? []).some(
+        (id) => id.toString() === userIdentifier._id.toString()
+      );
+      if (!alreadyLinked) {
+        child.identifiers = [...(child.identifiers ?? []), userIdentifier._id];
+        await child.save();
+      }
+    } else {
+      child = new User({
+        firstName: pending.firstName,
+        lastName: pending.lastName,
+        ...(pending.email ? { email: pending.email } : {}),
+        guardian: parentId,
+        identifiers: [userIdentifier._id],
+      });
+      child.jsonld = userToSelfDescription(child);
+      await child.save();
+      // Back-link the userIdentifier to the child user
+      userIdentifier.user = child._id;
+      await userIdentifier.save();
+    }
 
     // Link any existing cross-participant identifiers (only if email is present)
     if (pending.email) {
@@ -406,6 +426,7 @@ const applyChildConsentLifecycle = async (
   }
 ) => {
   const { consentId } = req.params;
+  const { triggerDataExchange } = req.query;
   const consent = await Consent.findOne({
     _id: consentId,
     status: { $nin: ["terminated", "revoked", "refused"] },
@@ -438,7 +459,11 @@ const applyChildConsentLifecycle = async (
     action: changes.action,
   });
 
-  return res.status(200).json(await consentToConsentReceipt(consent));
+  if (triggerDataExchange) {
+    return await triggerDataExchangeByConsentId(consent._id, res);
+  } else {
+    return res.status(200).json(await consentToConsentReceipt(consent));
+  }
 };
 
 export const revokeChildConsent = async (
