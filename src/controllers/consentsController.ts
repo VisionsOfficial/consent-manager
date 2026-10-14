@@ -1376,7 +1376,7 @@ export const triggerDataExchange = async (
   }
 };
 
-const triggerDataExchangeByConsentId = async (
+export const triggerDataExchangeByConsentId = async (
   consentId: string,
   res: Response
 ) => {

@@ -14,7 +14,11 @@ import { userToSelfDescription } from "../libs/jsonld/selfDescriptions";
 import { consentEvent } from "../utils/consentEvent";
 import { consentToConsentReceipt } from "../utils/consentReceipt";
 import { checkUserIdentifier } from "../utils/UserIdentifierMatchingProcessor";
-import { giveConsentUser, GiveConsentOnBehalf } from "./consentsController";
+import {
+  giveConsentUser,
+  GiveConsentOnBehalf,
+  triggerDataExchangeByConsentId,
+} from "./consentsController";
 import {
   notifyGuardianAction,
   sendGuardianInvite,
@@ -406,6 +410,7 @@ const applyChildConsentLifecycle = async (
   }
 ) => {
   const { consentId } = req.params;
+  const { triggerDataExchange } = req.query;
   const consent = await Consent.findOne({
     _id: consentId,
     status: { $nin: ["terminated", "revoked", "refused"] },
@@ -438,7 +443,11 @@ const applyChildConsentLifecycle = async (
     action: changes.action,
   });
 
-  return res.status(200).json(await consentToConsentReceipt(consent));
+  if (triggerDataExchange) {
+    return await triggerDataExchangeByConsentId(consent._id, res);
+  } else {
+    return res.status(200).json(await consentToConsentReceipt(consent));
+  }
 };
 
 export const revokeChildConsent = async (
