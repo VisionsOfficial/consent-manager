@@ -109,20 +109,34 @@ export const confirmGuardianship = async (
     });
     await userIdentifier.save();
 
-    // Create the child User with guardian reference
-    const child = new User({
-      firstName: pending.firstName,
-      lastName: pending.lastName,
-      email: pending.email,
-      guardian: parentId,
-      identifiers: [userIdentifier._id],
-    });
-    child.jsonld = userToSelfDescription(child);
-    await child.save();
+    // Reuse the existing User if any, otherwise create the child User
+    let child = pending.email
+      ? await User.findOne({
+          email: pending.email,
+          firstName: pending.firstName,
+          lastName: pending.lastName,
+          guardian: parentId,
+        })
+      : null;
 
-    // Back-link the userIdentifier to the child user
-    userIdentifier.user = child._id;
-    await userIdentifier.save();
+    if (child) {
+      child.identifiers = [...(child.identifiers ?? []), userIdentifier._id];
+      await child.save();
+    } else {
+      child = new User({
+        firstName: pending.firstName,
+        lastName: pending.lastName,
+        email: pending.email,
+        guardian: parentId,
+        identifiers: [userIdentifier._id],
+      });
+      child.jsonld = userToSelfDescription(child);
+      await child.save();
+
+      // Back-link the userIdentifier to the child user
+      userIdentifier.user = child._id;
+      await userIdentifier.save();
+    }
 
     // Link any existing cross-participant identifiers (only if email is present)
     if (pending.email) {
